@@ -1,0 +1,461 @@
+@font-face {
+    font-family: "Roboto";
+    src: url("fonts/Roboto-Regular.ttf");
+}
+
+body{
+    background-color: #fdfdfe!important;
+}
+
+.hero{
+    padding-top: 54px;
+}
+
+.container{
+    max-width: 1920px;
+
+}
+
+.header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1536px;
+    margin: 0 auto;
+    margin-bottom: 16px;
+}
+
+.line-through{
+    margin: 30px -56px 23px -56px;
+    height: 2px;
+    background: rgba(58, 66, 118, 0.2);
+}
+
+
+.date-picker{
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+.all-period{
+    display: flex;
+    align-items: center;
+}
+
+.checkbox {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox input[type="checkbox"] {
+    width: auto;
+    opacity: 0.00000001;
+    position: absolute;
+    left: 0;
+    margin-left: -20px;
+}
+.checkbox label {
+    position: relative;
+}
+.checkbox label:before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    margin: 4px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.28s ease;
+    border: 1px solid #3A4276;
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+.checkbox label:after {
+  content: '';
+    display: block;
+    width: 10px;
+    height: 5px;
+    border-bottom: 2px solid #fff;
+    border-left: 2px solid #fff;
+    -webkit-transform: rotate(-45deg) scale(0);
+    transform: rotate(-45deg) scale(0);
+    transition: transform ease 0.25s;
+    will-change: transform;
+    position: absolute;
+    top: 15px;
+    left: 10px;
+}
+.checkbox input[type="checkbox"]:checked ~ label::before {
+    background: #3A4276;
+    color: #fff;
+}
+
+.checkbox input[type="checkbox"]:checked ~ label::after {
+    -webkit-transform: rotate(-45deg) scale(1);
+    transform: rotate(-45deg) scale(1);
+}
+
+.checkbox label {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer;
+    vertical-align: sub;
+}
+.checkbox label span {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
+    color: #3A4276;
+    mix-blend-mode: normal;
+}
+.checkbox input[type="checkbox"]:focus + label::before {
+    outline: 0;
+}
+
+.picker{
+    width: 192px;
+    height: 40px;
+    background: #FFFFFF;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #3A4276;
+    border: none;
+    cursor: pointer;
+}
+
+#loader{
+    display: none;
+    position: fixed;
+    top: 40%;
+    left: 48%;
+    z-index: 1000;
+}
+
+.dash{
+    width: 16px;
+    height: 3px;
+    background: rgba(123, 127, 158, 0.87);
+    display: flex;
+    margin: 0 8px 0 8px;
+}
+
+.monitoring-group{
+    margin: 0 auto;
+    margin-bottom: 48px;
+    padding: 26px 56px 26px 56px;
+    max-width: 1536px;
+    min-height: 376px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.group-title{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 30px;
+    align-items: center;
+    letter-spacing: 0.15px;
+    color: #3A4276;
+}
+
+.data-sections{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.data-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 320px;
+    height: 184px;
+    background: #F1F3F6;
+    border: 2px solid rgba(58, 66, 118, 0.03);
+    box-sizing: border-box;
+    border-radius: 12px;
+    padding: 14px 24px 14px 24px;
+}
+
+.data-subsection{
+    display: flex;
+    flex-direction: column;
+    margin: 6px 0 6px 0;
+}
+
+.data-value{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 30px;
+    letter-spacing: 0.15px;
+    color: rgba(23, 24, 34, 0.87);}
+
+.data-description{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0.25px;   
+    color: rgba(23, 24, 34, 0.87);
+}
+
+.data-add-info{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0.25px;
+    color: #7B7F9E;  
+    mix-blend-mode: normal;
+}
+
+.data-next{   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 0 0 3px;
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    margin-left: 270px;
+    background-color: #fff;
+    background-image: url('images/circle.jpg');
+    background-position: 50%;
+    background-size: auto;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+}
+
+.data-icon{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 172, 48, 0.87);
+    border-radius: 50%;
+    margin-right: 20px;
+    color: #1B1D28;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.cross{
+    width: 2px;
+    height: 14px;
+    transform: rotate(90deg);
+}
+
+.vertical{
+    width: 2px;
+    height: 14px;
+    margin-left: -2px;
+}
+
+.central{
+    margin-left: 2px;
+}
+
+.data-row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.data-column{
+    display: flex;
+    flex-direction: column;
+}
+
+.data-column span{
+    margin: -2px 0 -2px 0;
+}
+
+p{
+    text-align: center;
+}
+
+p img{
+    max-width: 40px;
+    max-height: 40px;
+    cursor: pointer;
+}
+
+.ui-datepicker{
+    background-color: #fff!important;
+}
+
+.chart{
+    visibility: hidden;
+    height: 0px;
+}
+
+.visible{
+    height: 400px;
+}
+
+.visualization-toggle{
+    display: flex;
+    align-items: center;
+    margin-top: 28px;
+    cursor: pointer;
+    width: 170px;
+}
+
+.visualization-toggle span{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 21px;
+    margin-left: 12px;
+    color: #3A4276;
+}
+
+.ui-datepicker {
+    min-width: 288px;
+    margin: 5px auto 0;
+    font-family: Roboto;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    text-align: center;
+}
+
+.ui-datepicker table {
+    width: 100%;
+}
+
+.ui-datepicker-header {
+    background: #3399ff;
+    color: #ffffff;
+    font-family: Roboto;
+    border-width: 1px 0 0 0;
+    border-style: solid;
+    border-color: #111;
+}
+
+.ui-datepicker-title {
+    text-align: center;
+    font-size: 15px;
+
+}
+
+.ui-datepicker-month{
+    font-family: Roboto!important;
+}
+
+.ui-datepicker-prev {
+    float: left;
+    cursor: pointer;
+    background-position: center -30px;
+}
+
+.ui-datepicker-next {
+    float: right;
+    cursor: pointer;
+    background-position: center 0px;
+}
+
+.ui-datepicker thead {
+    background-color: #f7f7f7;
+
+    /*border-bottom: 1px solid #bbb;*/
+}
+
+.ui-datepicker th {
+    background-color:#fff;
+    text-transform: uppercase;
+    font-size: 8pt;
+    color: #666666;
+    /*text-shadow: 1px 0px 0px #fff;*/
+    /*filter: dropshadow(color=#fff, offx=1, offy=0);*/
+}
+
+
+.ui-datepicker tbody td {
+    padding: 0;
+    text-align: center;
+}
+
+    .ui-datepicker tbody td:last-child {
+        border-right: 0px;
+    }
+
+    .ui-datepicker tbody tr:last-child {
+        border-bottom: 0px;
+    }
+
+.ui-datepicker a {
+    text-decoration: none;
+}
+
+.ui-datepicker td span, .ui-datepicker td a {
+    font-family: Roboto!important;
+    display: inline-block;
+    font-weight: bold;
+    text-align: center!important;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    color: #ffffff;
+    text-shadow: 1px 1px 0px #fff;
+    filter: dropshadow(color=#fff, offx=1, offy=1);
+}
+
+.ui-datepicker-calendar .ui-state-default {
+      background: linear-gradient(#999999, #737373);
+      color:#ffffff;
+      height:40px;
+      width:40px;
+
+}
+
+.ui-datepicker-calendar .ui-state-hover {
+    background: #33adff;
+    color: #FFFFFF;
+}
+
+.ui-datepicker-calendar .ui-state-active {
+    background: #33adff;
+    -webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+    -moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+    box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+    color: #e0e0e0;
+    text-shadow: 0px 1px 0px #4d7a85;
+    border: 1px solid #55838f;
+    position: relative;
+    margin: -1px;
+}
+
+.ui-datepicker-unselectable .ui-state-default {
+    background: #D6E4BE;
+    color: #000;
+}
