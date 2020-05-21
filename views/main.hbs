@@ -1,0 +1,259 @@
+<html>
+<head>
+    <base href="/">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" type = "text/css" href="style.css">
+    <link rel="stylesheet" type = "text/css" href="jquery-ui.min.css">
+    <script src="listeners.js"></script>
+    <script src="jquery-3.4.1.min.js"></script>
+    <script src="jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        $( function() {
+            var dateFormat = "D dd.mm";
+            $.datepicker.regional['ru'] = {
+                monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+                monthNamesShort: ['Янв', 'Фев', 'Март', 'Апр', 'Май', 'Июнь',
+                        'Июль', 'Авг', 'Сент', 'Окт', 'Ноя', 'Дек'],
+                dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+                dayNamesShort: ['вс.', 'пн.', 'вт.', 'ср.', 'чт.', 'пт.', 'сб.'],
+                dayNamesMin: ['вс.', 'пн.', 'вт.', 'ср.', 'чт.', 'пт.', 'сб.'],
+                weekHeader: 'Нед',
+                dateFormat: dateFormat,
+                defaultDate: "+1w",
+                changeMonth: true,
+                numberOfMonths: 1
+            };
+            $.datepicker.setDefaults($.datepicker.regional['ru']);
+
+            from = $( "#from" )
+            .datepicker({
+                onSelect: function(){
+                    var event;
+                    if(typeof window.Event == "function"){
+                        event = new Event('change');
+                        this.dispatchEvent(event);
+                    } else {
+                        event = document.createEvent('HTMLEvents');
+                        event.initEvent('change', false, false);
+                        this.dispatchEvent(event);
+                    }
+                }
+            })
+            .on( "change", function() {
+            to.datepicker( "option", "minDate", getDate( this ) );
+            }),
+            to = $( "#to" ).datepicker({
+
+                onSelect: function(){
+                    var event;
+                    if(typeof window.Event == "function"){
+                        event = new Event('change');
+                        this.dispatchEvent(event);
+                    } else {
+                        event = document.createEvent('HTMLEvents');
+                        event.initEvent('change', false, false);
+                        this.dispatchEvent(event);
+                    }
+                }
+            })
+            .on( "change", function() {
+                from.datepicker( "option", "maxDate", getDate( this ) );
+            });
+ 
+            function getDate( element ) {
+                var date;
+                try {
+                    date = $.datepicker.parseDate( dateFormat, element.value );
+                } catch( error ) {
+                    date = null;
+                }
+                return date;
+            }
+
+            $('.visualization-toggle').click (function(){
+                $(this).siblings($('.chart')).toggleClass('visible');
+            });
+        });
+
+    </script>
+</head>
+<body>
+<div class="hero">
+    <div class="container">
+    <div class="header">
+        <div class="date-picker">
+            <input class="picker" type="text" id="from" name="from" value="{{fromdate}}">
+            <div class="dash"></div>
+            <input class="picker" type="text" id="to" name="to" value="{{todate}}">
+        </div>
+        <div class="all-period">
+            <div class="checkbox">
+                {{#if displayAll}}
+                    <input type="checkbox" id="all" name="all" value="1" checked>
+                {{else}}
+                    <input type="checkbox" id="all" name="all" value="1">
+                {{/if}}
+                <label for="all"><span>показывать данные за весь период</span></label>
+            </div>
+        </div>
+    </div>
+        <div class="row">
+            <img src="images/video-loader.gif" id="loader"/>
+            <ul id="list" class="list col-lg-12 col-12 mx-auto">
+                {{#each groups}}
+                    <div class="monitoring-group">
+                        <span class="group-title">
+                            {{title}}
+                        </span><br>
+                        <div class="line-through"></div>
+                        <div class="data-sections">
+                            <div class="data-section">
+                                <span class="data-value">{{uniqueFaces.faces}}</span>
+                                <span class="data-description">уникальных лиц</span>
+                                <span class="data-add-info">({{uniqueFaces.photos}} фото)</span>
+                                <div class="data-next"><img src="images/arrow.png"/></div>
+                            </div>
+                            <div class="data-section">
+                                <div class="data-subsection">
+                                    <span class="data-value">{{uniqueEvents}}</span>
+                                    <span class="data-description">сработок</span>
+                                    <span class="data-add-info">(по уникальным лицам)</span>
+                                </div>
+                                <div class="data-subsection">
+                                    <span class="data-value">{{events.length}}</span>
+                                    <span class="data-description">сработок</span>
+                                    <span class="data-add-info">(всего)</span>
+                                </div>
+                                <div class="data-next"><img src="images/arrow.png"/></div>
+                            </div>
+                            <div class="data-section">
+                                <div class="data-subsection">
+                                    <div class="data-row">
+                                        <div class="data-icon"><img src="images/minus.png" class="cross"/><img src="images/minus.png" class="vertical"/></div>
+                                        <div class="data-column">
+                                            <span class="data-value">11</span>
+                                            <span class="data-description">положительная идентификация</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="data-subsection">
+                                    <div class="data-row">
+                                        <div class="data-icon"><img src="images/unchecked.png"/></div>
+                                        <div class="data-column">
+                                            <span class="data-value">1</span>
+                                            <span class="data-description">не проверены</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="data-subsection">
+                                    <div class="data-row">
+                                        <div class="data-icon"><img src="images/minus.png" class="cross"/></div>
+                                        <div class="data-column">
+                                            <span class="data-value">2</span>
+                                            <span class="data-description">ложные сработки</span>
+                                        </div>
+                                    </div>         
+                                </div>
+                                <div class="data-next"><img src="images/arrow.png"/></div>
+                            </div>
+                            <div class="data-section">
+                                <div class="data-row">
+                                    <div class="data-icon"><img src="images/tick.png" class="central"/></div>
+                                    <div class="data-column">
+                                        <span class="data-value">8</span>
+                                        <span class="data-description">приняты меры</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="visualization">
+                                <div class="visualization-toggle">
+                                    <img src="images/toggle.png"/><span>Визуализация</span>
+                                </div>
+                                <div class="chart" id="{{title}}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        // Load google charts
+                        google.charts.load('current', {'packages':['corechart', 'line']});
+                        google.charts.setOnLoadCallback(drawChart);
+
+                        // Draw the chart and set the chart values
+                        function drawChart() {
+                            var data = new google.visualization.DataTable();
+                            data.addColumn('string', 'Day');
+                            data.addColumn('number', 'лица');
+                            data.addColumn('number', 'сработки');
+                            data.addColumn('number', 'уникальные сработки');
+
+                            var rows = [];
+                            {{#each days}}
+                                rows.push(['{{date}}', {{faces.length}}, {{events.length}}, {{uniqueEvents}}])
+                            {{/each}}
+
+                            data.addRows(rows);
+
+                            var options = {
+                                chart: {
+                                title: 'Events and faces',
+                                subtitle: 'grouped by days'
+                                },
+                                width: 1424,
+                                height: 400,
+                                tooltip: {
+                                    textStyle: { 
+                                        color: '#3A4276',
+                                        fontName: 'Roboto',
+                                        fontSize: 14,
+                                        bold: false,
+                                        italic: false
+                                    },
+                                    trigger: 'focus'                                  
+                                },
+                                legend: {
+                                    position: 'bottom',
+                                    textStyle: { 
+                                        color: '#3A4276',
+                                        fontName: 'Roboto',
+                                        fontSize: 12,
+                                        bold: false,
+                                        italic: false
+                                    }
+                                },
+                                colors: ['#FF4C61', '#FFB800', '#58D8F4'],
+                                hAxis: {textStyle: { 
+                                    color: '#7B7F9E',
+                                    fontName: 'Roboto',
+                                    fontSize: 12,
+                                    bold: false,
+                                    italic: false
+                                 }
+                                },
+                                vAxis: {textStyle: { 
+                                    color: '#7B7F9E',
+                                    fontName: 'Roboto',
+                                    fontSize: 12,
+                                    bold: false,
+                                    italic: false
+                                 }
+                                },
+                                focusTarget: 'category'
+                            };
+
+                        var chart = new google.visualization.LineChart(document.getElementById('{{title}}'));
+                        chart.draw(data, options);
+
+                        }
+                    </script>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
