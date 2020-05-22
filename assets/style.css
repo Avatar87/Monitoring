@@ -459,3 +459,9 @@ p img{
     background: #D6E4BE;
     color: #000;
 }
+
+.error{
+    display: none;
+    text-align: center;
+    color: red;
+}
