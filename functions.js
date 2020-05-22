@@ -161,8 +161,18 @@ const getUniqueEvents = (events) => {
   return uniqueEvents;
 }
 
+const getGlobalStartDate = () => {
+  var date = new Date();
+  var monthAgo = new Date().getMonth() - 1;
+  date.setHours(0);
+  date.setMinutes(0);
+  date.setSeconds(0);
+  date.setMonth(monthAgo);
+  return date.toISOString();
+}
+
 const mustBeAuthenticated = (req, res, next) => {
-  if(req.user) {
+  if(req.user && req.user !== 'notfound') {
     return next();
   } 
   res.redirect('/auth');
@@ -177,5 +187,6 @@ module.exports = {
     getEventsByPage,
     getUniqueFaces,
     getUniqueEvents,
+    getGlobalStartDate,
     mustBeAuthenticated
 }

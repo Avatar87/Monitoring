@@ -10,7 +10,7 @@ passport.use('local', new LocalStategy(async (username, password, done) => {
 
   if(!user) {
     console.log('User Not Found with username '+username);
-    return done(null, false);
+    return done(null, 'notfound');
   }
 
   if(User.encryptPass(password) === user.password) {
@@ -19,23 +19,33 @@ passport.use('local', new LocalStategy(async (username, password, done) => {
     return done(null, user);
   } 
     
-  return done(null, false);
+  return done(null, 'notfound');
 }));
 
 passport.serializeUser((user, done) => {
-  done(null, user.username);
+  if(user.username){
+    done(null, user.username);
+  }
+  else{
+    done(null, 'notfound');
+  }
 });
 
 passport.deserializeUser(async (username, done) => {
-  let user = await User.findOne(username);
-	let parsedstring = JSON.stringify(user);
-  user = JSON.parse(parsedstring);
-  done(null, user);
+  if(username === 'notfound'){
+    done(null, username);
+  }
+  else{
+    let user = await User.findOne(username);
+    let parsedstring = JSON.stringify(user);
+    user = JSON.parse(parsedstring);
+    done(null, user);
+  }
 });
 
 const authHandler = passport.authenticate('local', {
   successRedirect: '/dashboard',
-  failureRedirect: '/auth',
+  failureRedirect: '/auth'
 });
 
 module.exports = {
