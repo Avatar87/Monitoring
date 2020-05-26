@@ -22,7 +22,7 @@ MongoClient.connect(dbUrl, function(err, db) {
     console.log('Collection created!');
     //process.exit(0);
   });
-  var adminUser = {isAdmin: true, username: 'admin', password: User.encryptPass('aGVybnlh')};
+  var adminUser = {isAdmin: true, username: 'admin', password: User.encryptPass('123456')};
   currentDB.collection('users').findOneAndUpdate({id: 0}, {$set: adminUser},{upsert: true}, function(err) {
     if (err) throw err;
     console.log('1 user inserted');
