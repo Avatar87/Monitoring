@@ -52,7 +52,8 @@ request('http://localhost:8888/api/groups/')
         date1.setMonth(date1.getMonth() - 1);
     }
     else{
-        date1.setMonth(date1.getMonth());
+        var prevDay = date1.getDate() - 1;
+        date1.setDate(prevDay);
     }
     var date2 = new Date();
     var nextDay = new Date().getDate() + 1;
