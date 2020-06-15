@@ -329,6 +329,10 @@ p img{
     width: 170px;
 }
 
+.toggled{
+    transform: rotate(180deg);
+}
+
 .visualization-toggle span{
     font-family: Roboto;
     font-style: normal;
@@ -340,13 +344,18 @@ p img{
 }
 
 .ui-datepicker {
-    min-width: 288px;
     margin: 5px auto 0;
     font-family: Roboto;
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
     -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
     -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
     text-align: center;
+    width: 352px!important;
+    height: 368px!important;
+    background: #FFFFFF;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
+    border: none!important;
+    border-radius: 20px!important;
 }
 
 .ui-datepicker table {
@@ -354,34 +363,65 @@ p img{
 }
 
 .ui-datepicker-header {
-    background: #3399ff;
+    margin-top: 10px!important;
+    background: transparent!important;
     color: #ffffff;
     font-family: Roboto;
-    border-width: 1px 0 0 0;
-    border-style: solid;
-    border-color: #111;
+    border: none!important;
 }
 
 .ui-datepicker-title {
     text-align: center;
     font-size: 15px;
+}
 
+.ui-datepicker th{
+    text-transform: none!important;
+    font-family: Roboto!important;
+    font-style: normal!important;
+    font-weight: normal!important;
+    font-size: 20px!important;
+    color: #7B7F9E!important;
+}
+
+select {
+    width: 45px!important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
 }
 
 .ui-datepicker-month{
     font-family: Roboto!important;
+    border: none;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold!important;
+    font-size: 16px!important;
+    line-height: 21px!important;
+    color: #3A4276!important;
+}
+
+.ui-datepicker-year{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold!important;
+    font-size: 16px!important;
+    line-height: 21px!important;
+    color: #3A4276!important;
 }
 
 .ui-datepicker-prev {
     float: left;
     cursor: pointer;
-    background-position: center -30px;
+    margin-left: 8px;
 }
 
 .ui-datepicker-next {
     float: right;
     cursor: pointer;
-    background-position: center 0px;
+    margin-right: 8px;
 }
 
 .ui-datepicker thead {
@@ -403,6 +443,8 @@ p img{
 .ui-datepicker tbody td {
     padding: 0;
     text-align: center;
+    width: 46px!important;
+    height: 46px!important;
 }
 
     .ui-datepicker tbody td:last-child {
@@ -415,6 +457,9 @@ p img{
 
 .ui-datepicker a {
     text-decoration: none;
+    display: flex!important;
+    align-items: center!important;
+    justify-content: center!important;
 }
 
 .ui-datepicker td span, .ui-datepicker td a {
@@ -422,8 +467,8 @@ p img{
     display: inline-block;
     font-weight: bold;
     text-align: center!important;
-    width: 30px;
-    height: 30px;
+    width: 100%;
+    height: 100%;
     line-height: 30px;
     color: #ffffff;
     text-shadow: 1px 1px 0px #fff;
@@ -431,11 +476,13 @@ p img{
 }
 
 .ui-datepicker-calendar .ui-state-default {
-      background: linear-gradient(#999999, #737373);
-      color:#ffffff;
-      height:40px;
-      width:40px;
-
+    font-family: Roboto!important;
+    font-style: normal!important;
+    font-weight: bold!important;
+    font-size: 16px!important;
+    color: #3A4276!important;
+    border: none!important;
+    background-color: #FFFFFF!important;
 }
 
 .ui-datepicker-calendar .ui-state-hover {
@@ -444,13 +491,14 @@ p img{
 }
 
 .ui-datepicker-calendar .ui-state-active {
-    background: #33adff;
+    background: #FFA51F!important;
+    border-radius: 50%!important;
     -webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
     -moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
     box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
-    color: #e0e0e0;
+    color: #fff!important;
     text-shadow: 0px 1px 0px #4d7a85;
-    border: 1px solid #55838f;
+    border: 2px solid #FFF27E!important;
     position: relative;
     margin: -1px;
 }
@@ -458,6 +506,21 @@ p img{
 .ui-datepicker-unselectable .ui-state-default {
     background: #D6E4BE;
     color: #000;
+}
+
+.ui-priority-secondary{
+    opacity: 0.5!important;
+}
+
+.ui-datepicker-prev span {
+    background-image: url('images/arrow-blue.png') !important;
+    background-position: center !important;
+}
+
+.ui-datepicker-next span {
+    background-image: url('images/arrow-blue.png') !important;
+    background-position: center !important;
+    transform: rotate(180deg);
 }
 
 .error{
