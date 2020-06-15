@@ -19,12 +19,14 @@
                         'Июль', 'Авг', 'Сент', 'Окт', 'Ноя', 'Дек'],
                 dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
                 dayNamesShort: ['вс.', 'пн.', 'вт.', 'ср.', 'чт.', 'пт.', 'сб.'],
-                dayNamesMin: ['вс.', 'пн.', 'вт.', 'ср.', 'чт.', 'пт.', 'сб.'],
+                dayNamesMin: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
                 weekHeader: 'Нед',
                 dateFormat: dateFormat,
                 defaultDate: "+1w",
                 changeMonth: true,
-                numberOfMonths: 1
+                numberOfMonths: 1,
+                showOtherMonths: true,
+                selectOtherMonths: true
             };
             $.datepicker.setDefaults($.datepicker.regional['ru']);
 
@@ -75,6 +77,7 @@
 
             $('.visualization-toggle').click (function(){
                 $(this).siblings($('.chart')).toggleClass('visible');
+                $(this).children('.toggle-chart').toggleClass('toggled');
             });
         });
 
@@ -171,7 +174,7 @@
                         </div>
                             <div class="visualization">
                                 <div class="visualization-toggle">
-                                    <img src="images/toggle.png"/><span>Визуализация</span>
+                                    <img src="images/toggle.png" class="toggle-chart"/><span>Визуализация</span>
                                 </div>
                                 <div class="chart" id="{{title}}"></div>
                             </div>
@@ -233,13 +236,47 @@
                                     italic: false
                                  }
                                 },
-                                vAxis: {textStyle: { 
-                                    color: '#7B7F9E',
-                                    fontName: 'Roboto',
-                                    fontSize: 12,
-                                    bold: false,
-                                    italic: false
-                                 }
+                                series: {
+                                    0: {targetAxisIndex: 0},
+                                    1: {targetAxisIndex: 1},
+                                    2: {targetAxisIndex: 1}
+                                },
+                                vAxes: {
+                                    // Adds titles to each axis.
+                                    0: {
+                                        title: 'Лица',
+                                        textStyle: { 
+                                            color: '#7B7F9E',
+                                            fontName: 'Roboto',
+                                            fontSize: 12,
+                                            bold: false,
+                                            italic: false
+                                        },
+                                        titleTextStyle: {
+                                            color: '#7B7F9E',
+                                            fontName: 'Roboto',
+                                            fontSize: 12,
+                                            bold: false,
+                                            italic: false
+                                        }
+                                    },
+                                    1: {
+                                        title: 'Сработки',
+                                        textStyle: { 
+                                            color: '#7B7F9E',
+                                            fontName: 'Roboto',
+                                            fontSize: 12,
+                                            bold: false,
+                                            italic: false
+                                        },
+                                        titleTextStyle: {
+                                            color: '#7B7F9E',
+                                            fontName: 'Roboto',
+                                            fontSize: 12,
+                                            bold: false,
+                                            italic: false
+                                        },
+                                    }
                                 },
                                 focusTarget: 'category'
                             };
