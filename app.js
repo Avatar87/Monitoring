@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const consolidate = require('consolidate');
 const functions = require('./functions');
-const {parseValue, localeDateStringOverride, ISOStringOverride, getUniqueFaces, getUniqueEvents, getGlobalStartDate, mustBeAuthenticated} = functions;
+const {parseValue, parseStartDate, parseEndDate, localeDateStringOverride, ISOStringOverride, getUniqueFaces, getUniqueEvents, updateDays, getGlobalStartDate, mustBeAuthenticated} = functions;
 const config = require('./config');
 const {dbUrl} = config;
 const mongo = require('mongodb');
@@ -44,7 +44,7 @@ Date.prototype.toISOString = function(){
   return ISOStringOverride(this);
 }
 
-var currentFromDate, currentToDate, displayAll = false, groups = [];
+var currentFromDate, currentToDate, displayAll = false, groups = [], totalfaces = [];
 
 fs.readFile('groups.json', 'utf8', (err, data) => {
   if (err) throw err;
@@ -72,6 +72,7 @@ app.all('/dashboard', mustBeAuthenticated);
 app.get('/dashboard', (req, res) => {
   for(let group of groups){
       group.uniqueFaces = getUniqueFaces(group.faces);
+      group.photos = getUniqueFaces(group.faces).photos;
       group.uniqueEvents = getUniqueEvents(group.events);
   }
     res.render('main', {groups, fromdate: currentFromDate, todate: currentToDate, displayAll});
@@ -81,7 +82,6 @@ app.post('/date', (req, res) => {
   currentFromDate = req.body.fromdate ? req.body.fromdate : currentFromDate;
   currentToDate = req.body.todate ? req.body.todate : currentToDate;
   var date1, date2, endDate, nextDay, startDate;
-  var globalStartDate = getGlobalStartDate();
 
   if(req.body.fromdate && req.body.todate){
     date1 = new Date(parseValue(req.body.fromdate));
@@ -94,6 +94,7 @@ app.post('/date', (req, res) => {
     date2.setSeconds(0);
     endDate = date2.toISOString();
     displayAll = false;
+    updateDays(groups, startDate, endDate);
   }
   else if(req.body.fromdate){
     date1 = new Date(parseValue(req.body.fromdate));
@@ -106,6 +107,7 @@ app.post('/date', (req, res) => {
     date2.setSeconds(0);
     endDate = date2.toISOString();
     displayAll = false;
+    updateDays(groups, startDate, endDate);
   }
   else if(req.body.todate){
     date1 = new Date(parseValue(currentFromDate));
@@ -118,9 +120,10 @@ app.post('/date', (req, res) => {
     date2.setSeconds(0);
     endDate = date2.toISOString();
     displayAll = false;
+    updateDays(groups, startDate, endDate);
   }
   else if(req.body.displayall){
-    date1 = new Date(globalStartDate);
+    date1 = new Date(parseValue(currentFromDate));
     startDate = date1.toISOString();
     date2 = new Date(parseValue(currentToDate));
     nextDay = date2.getDate() + 1;
@@ -130,7 +133,9 @@ app.post('/date', (req, res) => {
     date2.setSeconds(0);
     endDate = date2.toISOString();
     displayAll = true;
+    updateDays(groups, startDate, endDate);
   }
+
   console.log('\nshowing events from '+startDate+' to '+endDate);
 
   MongoClient.connect(dbUrl, function(err, db) {
@@ -140,7 +145,10 @@ app.post('/date', (req, res) => {
       groups.forEach((group) => {
         group.events = [];
         group.faces = [];
-        promises.push(currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate, $gte: globalStartDate}}).
+        group.displayAll = displayAll;
+        group.startDate = parseStartDate(startDate);
+        group.endDate = parseEndDate(endDate);
+        promises.push(currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate}}).
         toArray().
           then((items) => {
             for(let face of items){
@@ -171,6 +179,7 @@ const getData = () => {
   date1.setHours(0);
   date1.setMinutes(0);
   date1.setSeconds(0);
+  date1.setMonth(date1.getMonth() - 1);
   let date2 = new Date();
   let nextDay = new Date().getDate() + 1;
   date2.setDate(nextDay);
@@ -190,7 +199,11 @@ const getData = () => {
       response.items.forEach((group) => {
         group.faces = [];
         group.events = [];
+        group.totalevents = [];
         group.days = [];
+        group.displayAll = displayAll;
+        group.startDate = parseStartDate(startDate);
+        group.endDate = parseEndDate(endDate);
         groups.push(group);
       })
     }).
@@ -199,10 +212,11 @@ const getData = () => {
         if (err) throw err;
         let currentDB = db.db('monitoring');
         groups.forEach((group) => {
-          promises.push(currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate, $gte: globalStartDate}}).
+          promises.push(currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate}}).
           toArray().
             then((items) => {
               for(let face of items){
+                totalfaces.push(face);
                 group.faces.push(face);
               }
               console.log(group.title+' faces: '+group.faces.length);
@@ -212,6 +226,7 @@ const getData = () => {
             then((items) => {
               for(let event of items){
                 group.events.push(event);
+                group.totalevents.push(event);
               }
               console.log(group.title+' events: '+group.events.length);
             }));
@@ -242,7 +257,7 @@ const getData = () => {
               console.log(group.title+' events: '+group.events.length);
             }).
             then(() => {
-              currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate, $gte: globalStartDate}}).
+              currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate}}).
               toArray().
               then((items) => {
                   let now = new Date();
@@ -258,7 +273,7 @@ const getData = () => {
                     nextDay.setSeconds(0);
                     for(let face of items){
                       let faceDate = new Date(face.timestamp);
-                      if(faceDate >= new Date(globalStartDate) && faceDate < nextDay){
+                      if(faceDate < nextDay){
                         day.faces.push(face);
                       }
                     }
@@ -273,7 +288,10 @@ const getData = () => {
         console.log('Data retrieved! '+new Date().toTimeString());
     });
   });
-  currentFromDate = new Date().toLocaleDateString('ru-RU');
+  var date = new Date();
+  var monthAgo = new Date().getMonth() - 1;
+  date.setMonth(monthAgo);
+  currentFromDate = date.toLocaleDateString('ru-RU');
   currentToDate = new Date().toLocaleDateString('ru-RU');
   displayAll = false;
   let minute = 60000;

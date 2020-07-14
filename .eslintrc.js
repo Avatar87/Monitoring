@@ -45,7 +45,7 @@ module.exports = {
         "callback-return": "error",
         "camelcase": "error",
         "capitalized-comments": [
-            "error",
+            "off",
             "never"
         ],
         "class-methods-use-this": "error",
@@ -55,7 +55,7 @@ module.exports = {
             "error",
             "last"
         ],
-        "complexity": "error",
+        "complexity": "off",
         "computed-property-spacing": [
             "error",
             "never"
@@ -82,13 +82,13 @@ module.exports = {
         "func-style": [
             "error"
         ],
-        "function-paren-newline": "error",
+        "function-paren-newline": "off",
         "generator-star-spacing": "error",
         "global-require": "error",
         "guard-for-in": "error",
         "handle-callback-err": "error",
         "id-blacklist": "error",
-        "id-length": "error",
+        "id-length": "off",
         "id-match": "error",
         "implicit-arrow-linebreak": [
             "error",
@@ -111,13 +111,13 @@ module.exports = {
         "max-classes-per-file": "error",
         "max-depth": "off",
         "max-len": "off",
-        "max-lines": "error",
+        "max-lines": "off",
         "max-lines-per-function": "off",
-        "max-nested-callbacks": "error",
+        "max-nested-callbacks": "off",
         "max-params": "off",
         "max-statements": "off",
         "max-statements-per-line": "error",
-        "multiline-comment-style": "error",
+        "multiline-comment-style": "off",
         "multiline-ternary": "off",
         "new-cap": "off",
         "new-parens": "error",
@@ -127,7 +127,7 @@ module.exports = {
         "no-alert": "error",
         "no-array-constructor": "error",
         "no-async-promise-executor": "error",
-        "no-await-in-loop": "error",
+        "no-await-in-loop": "off",
         "no-bitwise": "error",
         "no-buffer-constructor": "error",
         "no-caller": "error",
@@ -278,7 +278,7 @@ module.exports = {
         "space-infix-ops": "off",
         "space-unary-ops": "error",
         "spaced-comment": [
-            "error",
+            "off",
             "never"
         ],
         "strict": "error",

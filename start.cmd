@@ -1,3 +1,3 @@
 call npm i
-node app.js
+node --max-old-space-size=16384 app.js
 
