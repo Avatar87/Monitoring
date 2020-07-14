@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const consolidate = require('consolidate');
 const functions = require('./functions');
-const {parseValue, parseStartDate, parseEndDate, localeDateStringOverride, ISOStringOverride, getUniqueFaces, getUniqueEvents, updateDays, getGlobalStartDate, mustBeAuthenticated} = functions;
+const {leadingZero, parseValue, parseStartDate, parseEndDate, localeDateStringOverride, ISOStringOverride, getUniqueFaces, getUniqueEvents, updateDays, getGlobalStartDate, mustBeAuthenticated} = functions;
 const config = require('./config');
 const {dbUrl} = config;
 const mongo = require('mongodb');
@@ -187,6 +187,14 @@ const getData = () => {
 
   console.log('\nshowing events from '+startDate+' to '+endDate);
 
+  let lastUpdated;
+  fs.readFile('./logs/lastupdate.log', 'utf8', (err, data) => {
+    if (err) throw err;
+    let updateDate = new Date(data);
+    let result = updateDate.getHours()+':'+updateDate.getMinutes()+' '+leadingZero(updateDate.getDate())+'.'+leadingZero(updateDate.getMonth())+'.'+updateDate.getFullYear()
+    lastUpdated = result;
+  });
+
   request('http://localhost:8888/api/groups/').
     then((response) => JSON.parse(response)).
     then((response) => {
@@ -198,6 +206,7 @@ const getData = () => {
         group.displayAll = displayAll;
         group.startDate = parseStartDate(startDate);
         group.endDate = parseEndDate(endDate);
+        group.lastUpdated = lastUpdated;
         groups.push(group);
       })
     }).
