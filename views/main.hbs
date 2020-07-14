@@ -117,7 +117,7 @@
                         <div class="line-through"></div>
                         <div class="data-sections">
                             <div class="data-section" {{#if displayAll}} style="height: 208px;" {{/if}}>
-                                <span class="data-value">{{uniqueFaces.faces}}</span>
+                                <span class="data-value">{{uniqueFaces.faces.length}}</span>
                                 <span class="data-description">уникальных лиц</span>
                                 <span class="data-add-info">({{photos}} фото)</span>
                                 <div class="data-next"><img src="images/arrow.png"/></div>
@@ -233,7 +233,7 @@
                             var rows = [];
                             
                             {{#each days}}
-                                rows.push(['{{date}}', {{uniqueFaces.faces}}, {{events.length}}, {{uniqueEvents}}])
+                                rows.push(['{{date}}', {{uniqueFaces.faces}}, {{events}}, {{uniqueEvents}}])
                             {{/each}}
 
                             data.addRows(rows);

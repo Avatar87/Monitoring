@@ -70,11 +70,6 @@ app.post('/auth', authHandler);
 app.all('/dashboard', mustBeAuthenticated);
 
 app.get('/dashboard', (req, res) => {
-  for(let group of groups){
-      group.uniqueFaces = getUniqueFaces(group.faces);
-      group.photos = getUniqueFaces(group.faces).photos;
-      group.uniqueEvents = getUniqueEvents(group.events);
-  }
     res.render('main', {groups, fromdate: currentFromDate, todate: currentToDate, displayAll});
 });
 
@@ -219,20 +214,24 @@ const getData = () => {
                 totalfaces.push(face);
                 group.faces.push(face);
               }
+              group.uniqueFaces = getUniqueFaces(group.faces);
+              group.photos = getUniqueFaces(group.faces).photos;
               console.log(group.title+' faces: '+group.faces.length);
             }));
-          promises.push(currentDB.collection('events').find({'matched_face.id.monitoring': {$in: group.monitorings}, 'matched_face.labels.status': {$ne: 'cancelled'}, 'face.timestamp': {$lt: endDate, $gte: startDate}}).
+          promises.push(currentDB.collection('events').find({'matched_face.id.monitoring': {$in: group.monitorings}, 'matched_face.labels.status': {$ne: 'cancelled'}, 'face.timestamp': {$lt: endDate, $gte: globalStartDate}}).
           toArray().
             then((items) => {
               for(let event of items){
                 group.events.push(event);
                 group.totalevents.push(event);
               }
+              group.uniqueEvents = getUniqueEvents(group.events);
               console.log(group.title+' events: '+group.events.length);
             }));
           promises.push(currentDB.collection('events').find({'matched_face.id.monitoring': {$in: group.monitorings}, 'matched_face.labels.status': {$ne: 'cancelled'}, 'face.timestamp': {$lt: endDate, $gte: globalStartDate}}).
           toArray().
             then((items) => {
+                let uniqueItems = getUniqueEvents(items);
                 let now = new Date();
                 now.setHours(0);
                 now.setMinutes(0);
@@ -244,15 +243,22 @@ const getData = () => {
                   nextDay.setHours(0);
                   nextDay.setMinutes(0);
                   nextDay.setSeconds(0);
+                  day.events = 0;
+                  day.uniqueEvents = 0;
                   for(let event of items){
                     let eventDate = new Date(event.face.timestamp);
                     if(eventDate >= date && eventDate < nextDay){
-                      day.events.push(event);
+                      day.events++;
+                    }
+                  }
+                  for(let event of uniqueItems){
+                    let eventDate = new Date(event.face.timestamp);
+                    if(eventDate >= date && eventDate < nextDay){
+                      day.uniqueEvents++;
                     }
                   }
                   day.date = date.toLocaleDateString('ru-RU').split(' ')[1];
                   group.days.push(day);
-                  day.uniqueEvents = getUniqueEvents(day.events);               
                 }
               console.log(group.title+' events: '+group.events.length);
             }).
@@ -260,6 +266,7 @@ const getData = () => {
               currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate}}).
               toArray().
               then((items) => {
+                  let uniqueItems = getUniqueFaces(items);
                   let now = new Date();
                   now.setHours(0);
                   now.setMinutes(0);
@@ -271,10 +278,11 @@ const getData = () => {
                     nextDay.setHours(0);
                     nextDay.setMinutes(0);
                     nextDay.setSeconds(0);
-                    for(let face of items){
+                    day.faces = 0;
+                    for(let face of uniqueItems.faces){
                       let faceDate = new Date(face.timestamp);
                       if(faceDate < nextDay){
-                        day.faces.push(face);
+                        day.faces++;
                       }
                     }
                   }
