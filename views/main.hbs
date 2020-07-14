@@ -76,8 +76,11 @@
             }
 
             $('.visualization-toggle').click (function(){
-                $(this).siblings($('.chart')).toggleClass('visible');
+                $(this).siblings('.chart').toggleClass('visible');
                 $(this).children('.toggle-chart').toggleClass('toggled');
+                $(this).siblings('.legend').toggleClass('seen');
+                $(this).siblings('.axisnames').toggleClass('seen');
+                $(this).toggleClass('toggled');
             });
         });
 
@@ -113,26 +116,39 @@
                         </span><br>
                         <div class="line-through"></div>
                         <div class="data-sections">
-                            <div class="data-section">
+                            <div class="data-section" {{#if displayAll}} style="height: 208px;" {{/if}}>
                                 <span class="data-value">{{uniqueFaces.faces}}</span>
                                 <span class="data-description">уникальных лиц</span>
-                                <span class="data-add-info">({{uniqueFaces.photos}} фото)</span>
+                                <span class="data-add-info">({{photos}} фото)</span>
                                 <div class="data-next"><img src="images/arrow.png"/></div>
                             </div>
-                            <div class="data-section">
+                            <div class="data-section" {{#if displayAll}} style="height: 208px; padding: 16px;" {{/if}}>
                                 <div class="data-subsection">
-                                    <span class="data-value">{{uniqueEvents}}</span>
-                                    <span class="data-description">сработок</span>
-                                    <span class="data-add-info">(по уникальным лицам)</span>
+                                    <div class="data-wrap" {{#if displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                        <span class="data-value" {{#if displayAll}} style="margin-right: 5px;" {{/if}}>{{uniqueEvents}}</span>
+                                        <span class="data-description">сработок</span>
+                                    </div>
+                                    <span class="data-add-info">(по уникальным лицам{{#if displayAll}} c {{startDate}} по {{endDate}}{{/if}})</span>
                                 </div>
                                 <div class="data-subsection">
-                                    <span class="data-value">{{events.length}}</span>
-                                    <span class="data-description">сработок</span>
-                                    <span class="data-add-info">(всего)</span>
+                                    <div class="data-wrap" {{#if displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                        <span class="data-value" {{#if displayAll}} style="margin-right: 5px;" {{/if}}>{{events.length}}</span>
+                                        <span class="data-description">сработок</span>
+                                    </div>
+                                    <span class="data-add-info">(всего{{#if displayAll}} c {{startDate}} по {{endDate}}{{/if}})</span>
                                 </div>
+                                {{#if displayAll}}
+                                <div class="data-subsection">
+                                    <div class="data-wrap" {{#if displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                        <span class="data-value" {{#if displayAll}} style="margin-right: 5px;" {{/if}}>{{totalevents.length}}</span>
+                                        <span class="data-description">сработок</span>
+                                    </div>
+                                    <span class="data-add-info">(за весь период)</span>
+                                </div>
+                                {{/if}}
                                 <div class="data-next"><img src="images/arrow.png"/></div>
                             </div>
-                            <div class="data-section">
+                            <div class="data-section" {{#if displayAll}} style="height: 208px;" {{/if}}>
                                 <div class="data-subsection">
                                     <div class="data-row">
                                         <div class="data-icon"><img src="images/minus.png" class="cross"/><img src="images/minus.png" class="vertical"/></div>
@@ -162,7 +178,7 @@
                                 </div>
                                 <div class="data-next"><img src="images/arrow.png"/></div>
                             </div>
-                            <div class="data-section">
+                            <div class="data-section" {{#if displayAll}} style="height: 208px;" {{/if}}>
                                 <div class="data-row">
                                     <div class="data-icon"><img src="images/tick.png" class="central"/></div>
                                     <div class="data-column">
@@ -176,7 +192,28 @@
                                 <div class="visualization-toggle">
                                     <img src="images/toggle.png" class="toggle-chart"/><span>Визуализация</span>
                                 </div>
+                                <div class="axisnames">
+                                    <div class="axisname"><span class="firstaxis">Лица</span></div>
+
+                                    <div class="axisname"><span class="secondaxis">Сработки</span></div>
+                                </div>
                                 <div class="chart" id="{{title}}"></div>
+                                <div class="legend">
+                                    <div class="checkbox-legend checkbox-red">
+                                        <input type="checkbox" id="faces-box-{{title}}" name="faces-box" value="1" checked>
+                                        <label for="faces-box-{{title}}" id="faces-box-label-{{title}}"><span>лица</span></label>
+                                    </div>
+
+                                    <div class="checkbox-legend checkbox-blue">
+                                        <input type="checkbox" id="uniquevents-box-{{title}}" name="faces-box" value="1" checked>
+                                        <label for="uniquevents-box-{{title}}" id="uniquevents-box-label-{{title}}"><span>уникальные сработки</span></label>
+                                    </div>
+
+                                    <div class="checkbox-legend checkbox-yellow">
+                                        <input type="checkbox" id="events-box-{{title}}" name="events-box" value="1" checked>
+                                        <label for="events-box-{{title}}" id="events-box-label-{{title}}"><span>сработки</span></label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -194,6 +231,7 @@
                             data.addColumn('number', 'уникальные сработки');
 
                             var rows = [];
+                            
                             {{#each days}}
                                 rows.push(['{{date}}', {{faces.length}}, {{events.length}}, {{uniqueEvents}}])
                             {{/each}}
@@ -218,11 +256,12 @@
                                     trigger: 'focus'                                  
                                 },
                                 legend: {
-                                    position: 'bottom',
+                                    position: 'none',
+                                    alignment: 'center',
                                     textStyle: { 
                                         color: '#3A4276',
                                         fontName: 'Roboto',
-                                        fontSize: 12,
+                                        fontSize: 14,
                                         bold: false,
                                         italic: false
                                     }
@@ -244,7 +283,7 @@
                                 vAxes: {
                                     // Adds titles to each axis.
                                     0: {
-                                        title: 'Лица',
+                                        //title: 'Лица',
                                         textStyle: { 
                                             color: '#7B7F9E',
                                             fontName: 'Roboto',
@@ -252,16 +291,16 @@
                                             bold: false,
                                             italic: false
                                         },
-                                        titleTextStyle: {
-                                            color: '#7B7F9E',
-                                            fontName: 'Roboto',
-                                            fontSize: 12,
-                                            bold: false,
-                                            italic: false
-                                        }
+                                        //titleTextStyle: {
+                                            //color: '#7B7F9E',
+                                            //fontName: 'Roboto',
+                                            //fontSize: 14,
+                                            //bold: false,
+                                            //italic: false
+                                        //}
                                     },
                                     1: {
-                                        title: 'Сработки',
+                                        //title: 'Сработки',
                                         textStyle: { 
                                             color: '#7B7F9E',
                                             fontName: 'Roboto',
@@ -269,21 +308,103 @@
                                             bold: false,
                                             italic: false
                                         },
-                                        titleTextStyle: {
-                                            color: '#7B7F9E',
-                                            fontName: 'Roboto',
-                                            fontSize: 12,
-                                            bold: false,
-                                            italic: false
-                                        },
+                                        //titleTextStyle: {
+                                            //color: '#7B7F9E',
+                                            //fontName: 'Roboto',
+                                            //fontSize: 14,
+                                            //bold: false,
+                                            //italic: false
+                                        //},
                                     }
                                 },
                                 focusTarget: 'category'
                             };
 
-                        var chart = new google.visualization.LineChart(document.getElementById('{{title}}'));
-                        chart.draw(data, options);
+                            var chart = new google.visualization.LineChart(document.getElementById('{{title}}'));
+                            chart.draw(data, options);
 
+                            function showHideLines(selector){
+                                switch(selector) {
+                                    case 'faces':
+                                        var color = options.colors[0];
+                                        if(color === '#FF4C61'){
+                                            options.colors[0] = "#FFFFFF";
+                                            options.series[0].lineWidth = 0;
+                                            options.vAxes[0].textStyle.color = "#FFFFFF";
+                                            $(".firstaxis").css("color", "#FFFFFF");
+                                            data.removeRows(0,10)
+                                        }
+                                        else{
+                                            options.series[0].lineWidth = 2;
+                                            options.colors[0] = "#FF4C61";
+                                            options.vAxes[0].textStyle.color = "#7B7F9E";
+                                            $(".firstaxis").css("color", "#7B7F9E");
+                                        }
+                                    break;
+
+                                    case 'events':
+                                        var color = options.colors[1];
+                                        if(color === '#FFB800'){
+                                            options.colors[1] = "#FFFFFF";
+                                            options.series[1].lineWidth = 0;
+                                            if(options.colors[2] === "#FFFFFF"){
+                                                options.vAxes[1].textStyle.color = "#FFFFFF";
+                                                $(".secondaxis").css("color", "#FFFFFF");
+                                            }
+                                        }
+                                        else{
+                                            options.series[1].lineWidth = 2;
+                                            options.colors[1] = "#FFB800";
+                                            options.vAxes[1].textStyle.color = "#7B7F9E";
+                                            $(".secondaxis").css("color", "#7B7F9E");
+                                        }
+                                    break;
+
+                                    case 'uniqueEvents':
+                                        var color = options.colors[2];
+                                        if(color === '#58D8F4'){
+                                            options.series[2].lineWidth = 0;
+                                            options.colors[2] = "#FFFFFF";
+                                            if(options.colors[1] === "#FFFFFF"){
+                                                options.vAxes[1].textStyle.color = "#FFFFFF";
+                                                $(".secondaxis").css("color", "#FFFFFF");
+                                            }
+                                        }
+                                        else{
+                                            options.series[2].lineWidth = 2;
+                                            options.colors[2] = "#58D8F4";
+                                            options.vAxes[1].textStyle.color = "#7B7F9E";
+                                            $(".secondaxis").css("color", "#7B7F9E");
+                                        }
+                                    break;
+
+                                    default:
+                                        break;
+                                }
+                                chart.draw(data, options);
+                            }
+
+                            document.getElementById('faces-box-label-{{title}}').addEventListener('click', () => {showHideLines('faces')})
+                            document.getElementById('uniquevents-box-label-{{title}}').addEventListener('click', () => {showHideLines('uniqueEvents')})
+                            document.getElementById('events-box-label-{{title}}').addEventListener('click', () => {showHideLines('events')})
+
+                            function handleSelect(){
+                                var targetX = document.getElementsByTagName('circle')[0].getAttribute('cx');
+                                var isFilled = document.getElementsByTagName('circle')[0].getAttribute('fill') !== 'none';
+                                var textCollection = document.getElementsByTagName('text');
+                                Array.from(textCollection).forEach(element => {
+                                    if(element.getAttribute('x') == targetX && isFilled){
+                                        element.style.fontSize = '14px';
+                                        element.style.fontWeight = 'bold';
+                                    }
+                                    else{
+                                        element.style.fontSize = '12px';
+                                        element.style.fontWeight = 'normal';
+                                    }
+                                })
+                            }
+
+                            google.visualization.events.addListener(chart, 'select', handleSelect);
                         }
                     </script>
                 {{/each}}
