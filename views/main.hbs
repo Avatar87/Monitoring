@@ -233,7 +233,7 @@
                             var rows = [];
                             
                             {{#each days}}
-                                rows.push(['{{date}}', {{faces.length}}, {{events.length}}, {{uniqueEvents}}])
+                                rows.push(['{{date}}', {{uniqueFaces.length}}, {{events.length}}, {{uniqueEvents}}])
                             {{/each}}
 
                             data.addRows(rows);
@@ -332,7 +332,6 @@
                                             options.series[0].lineWidth = 0;
                                             options.vAxes[0].textStyle.color = "#FFFFFF";
                                             $(".firstaxis").css("color", "#FFFFFF");
-                                            data.removeRows(0,10)
                                         }
                                         else{
                                             options.series[0].lineWidth = 2;
