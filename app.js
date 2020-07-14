@@ -89,7 +89,6 @@ app.post('/date', (req, res) => {
     date2.setSeconds(0);
     endDate = date2.toISOString();
     displayAll = false;
-    updateDays(groups, startDate, endDate);
   }
   else if(req.body.fromdate){
     date1 = new Date(parseValue(req.body.fromdate));
@@ -102,7 +101,6 @@ app.post('/date', (req, res) => {
     date2.setSeconds(0);
     endDate = date2.toISOString();
     displayAll = false;
-    updateDays(groups, startDate, endDate);
   }
   else if(req.body.todate){
     date1 = new Date(parseValue(currentFromDate));
@@ -115,7 +113,6 @@ app.post('/date', (req, res) => {
     date2.setSeconds(0);
     endDate = date2.toISOString();
     displayAll = false;
-    updateDays(groups, startDate, endDate);
   }
   else if(req.body.displayall){
     date1 = new Date(parseValue(currentFromDate));
@@ -128,7 +125,6 @@ app.post('/date', (req, res) => {
     date2.setSeconds(0);
     endDate = date2.toISOString();
     displayAll = true;
-    updateDays(groups, startDate, endDate);
   }
 
   console.log('\nshowing events from '+startDate+' to '+endDate);
@@ -157,11 +153,14 @@ app.post('/date', (req, res) => {
             for(let event of items){
               group.events.push(event);
             }
+            group.uniqueEvents = getUniqueEvents(group.events);
             console.log(group.title+' events: '+group.events.length);
+            console.log(group.title+' unique events: '+group.uniqueEvents.length);
           }));
       })
       Promise.all(promises).
       then(() => {
+        updateDays(groups, startDate, endDate);
         res.send({response: 'success'});
       });
   })
@@ -227,6 +226,7 @@ const getData = () => {
               }
               group.uniqueEvents = getUniqueEvents(group.events);
               console.log(group.title+' events: '+group.events.length);
+              console.log(group.title+' unique events: '+group.uniqueEvents.length);
             }));
           promises.push(currentDB.collection('events').find({'matched_face.id.monitoring': {$in: group.monitorings}, 'matched_face.labels.status': {$ne: 'cancelled'}, 'face.timestamp': {$lt: endDate, $gte: globalStartDate}}).
           toArray().

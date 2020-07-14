@@ -193,7 +193,7 @@ const updateDays = (groups, startDate, endDate) => {
     date1 = new Date(startDate);
     date2 = new Date(endDate);
     for (let date = date1; date < date2; date.setDate(date.getDate() + 1)) {
-      let day = {events: [], uniqueEvents: 0, faces: []};
+      let day = {events: 0, uniqueEvents: 0, faces: 0};
       let nextDay = new Date(date);
       nextDay.setDate(date.getDate() + 1);
       nextDay.setHours(0);
@@ -202,12 +202,23 @@ const updateDays = (groups, startDate, endDate) => {
       for(let event of group.events){
         let eventDate = new Date(event.face.timestamp);
         if(eventDate >= date && eventDate < nextDay){
-          day.events.push(event);
+          day.events++;
+        }
+      }
+      for(let event of group.uniqueEvents){
+        let eventDate = new Date(event.face.timestamp);
+        if(eventDate >= date && eventDate < nextDay){
+          day.uniqueEvents++;
+        }
+      }
+      for(let face of group.uniqueFaces.faces){
+        let faceDate = new Date(face.timestamp);
+        if(faceDate < nextDay){
+          day.faces++;
         }
       }
       day.date = date.toLocaleDateString('ru-RU').split(' ')[1];
       group.days.push(day);
-      day.uniqueEvents = getUniqueEvents(day.events);               
     }
   })
 }

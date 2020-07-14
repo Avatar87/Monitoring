@@ -233,7 +233,7 @@
                             var rows = [];
                             
                             {{#each days}}
-                                rows.push(['{{date}}', {{uniqueFaces.faces}}, {{events}}, {{uniqueEvents}}])
+                                rows.push(['{{date}}', {{faces}}, {{events}}, {{uniqueEvents}}])
                             {{/each}}
 
                             data.addRows(rows);
