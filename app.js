@@ -44,11 +44,11 @@ Date.prototype.toISOString = function(){
   return ISOStringOverride(this);
 }
 
-var currentFromDate, currentToDate, displayAll = false, groups = [], totalfaces = [];
+var currentFromDate, currentToDate, displayAll = false, groups = [], groupsData, totalfaces = [];
 
-fs.readFile('groups.json', 'utf8', (err, data) => {
-  if (err) throw err;
-  let items = JSON.parse(data.toString('utf8').replace(/^\uFEFF/, ''));
+try{
+  groupsData = fs.readFileSync('groups.json', 'utf8')
+  let items = JSON.parse(groupsData.toString('utf8').replace(/^\uFEFF/, ''));
   app.get('/api/groups', (req, res) => {
     res.status(200).send({
       success: 'true',
@@ -56,7 +56,10 @@ fs.readFile('groups.json', 'utf8', (err, data) => {
       items
     })
   });
-});
+}
+catch (err) {
+  console.error(err);
+}
 
 app.get('/auth', (req, res) => {
   if(req.user === 'notfound'){
