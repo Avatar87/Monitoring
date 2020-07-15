@@ -117,15 +117,20 @@
                         <div class="line-through"></div>
                         <div class="data-sections">
                             <div class="data-section" {{#if displayAll}} style="height: 208px;" {{/if}}>
-                                <span class="data-value">{{uniqueFaces.faces}}</span>
+                                <span class="data-value">{{uniqueFaces.faces.length}}</span>
                                 <span class="data-description">уникальных лиц</span>
                                 <span class="data-add-info">({{photos}} фото)</span>
+                                {{#if lastUpdated}}
+                                <span class="data-add-info">на момент {{lastUpdated}}</span>
+                                {{else}}
+                                <span class="data-add-info">данные не обновлялись</span>
+                                {{/if}}
                                 <div class="data-next"><img src="images/arrow.png"/></div>
                             </div>
                             <div class="data-section" {{#if displayAll}} style="height: 208px; padding: 16px;" {{/if}}>
                                 <div class="data-subsection">
                                     <div class="data-wrap" {{#if displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
-                                        <span class="data-value" {{#if displayAll}} style="margin-right: 5px;" {{/if}}>{{uniqueEvents}}</span>
+                                        <span class="data-value" {{#if displayAll}} style="margin-right: 5px;" {{/if}}>{{uniqueEvents.length}}</span>
                                         <span class="data-description">сработок</span>
                                     </div>
                                     <span class="data-add-info">(по уникальным лицам{{#if displayAll}} c {{startDate}} по {{endDate}}{{/if}})</span>
@@ -233,7 +238,7 @@
                             var rows = [];
                             
                             {{#each days}}
-                                rows.push(['{{date}}', {{faces.length}}, {{events.length}}, {{uniqueEvents}}])
+                                rows.push(['{{date}}', {{faces}}, {{events}}, {{uniqueEvents}}])
                             {{/each}}
 
                             data.addRows(rows);
@@ -332,7 +337,6 @@
                                             options.series[0].lineWidth = 0;
                                             options.vAxes[0].textStyle.color = "#FFFFFF";
                                             $(".firstaxis").css("color", "#FFFFFF");
-                                            data.removeRows(0,10)
                                         }
                                         else{
                                             options.series[0].lineWidth = 2;

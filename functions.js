@@ -110,13 +110,14 @@ const getEventsByPage = (startDate, endDate, page = '', events = []) => {
 }
 
 const getUniqueFaces = (faces) => {
-  const uniqueFaces = {faces: 0, photos: 0}
+  const uniqueFaces = {faces: [], photos: 0}
   const facesMap = new Map();
   for (const face of faces) {
     if(face.labels){
       if(face.labels.title){
         if(!facesMap.has(face.labels.title)){
           facesMap.set(face.labels.title, true);
+          uniqueFaces.faces.push(face);
           if(face.photo){
             uniqueFaces.photos++;
           }
@@ -125,6 +126,7 @@ const getUniqueFaces = (faces) => {
       else if(face.labels.name && !face.labels.title){
         if(!facesMap.has(face.labels.name)){
           facesMap.set(face.labels.name, true);
+          uniqueFaces.faces.push(face);
           if(face.photo){
             uniqueFaces.photos++;
           }
@@ -133,6 +135,7 @@ const getUniqueFaces = (faces) => {
       else if(face.labels.fio && !face.labels.title && !face.labels.name){
         if(!facesMap.has(face.labels.fio)){
           facesMap.set(face.labels.fio, true);
+          uniqueFaces.faces.push(face);
           if(face.photo){
             uniqueFaces.photos++;
           }
@@ -141,6 +144,7 @@ const getUniqueFaces = (faces) => {
       else if(face.id.face && !face.labels.title && !face.labels.name && !face.labels.fio){
         if(!facesMap.has(face.id.face)){
           facesMap.set(face.id.face, true);
+          uniqueFaces.faces.push(face);
           if(face.photo){
             uniqueFaces.photos++;
           }
@@ -149,13 +153,11 @@ const getUniqueFaces = (faces) => {
     }
   }
 
-  uniqueFaces.faces = facesMap.size;
-
   return uniqueFaces;
 }
 
 const getUniqueEvents = (events) => {
-  var uniqueEvents = 0;
+  var uniqueEvents = [];
   const eventsMap = new Map();
   for (const event of events) {
     if(event.matched_face !== null){
@@ -163,22 +165,24 @@ const getUniqueEvents = (events) => {
         if(event.matched_face.labels.title){
           if(!eventsMap.has(event.matched_face.labels.title)){
             eventsMap.set(event.matched_face.labels.title, true);
+            uniqueEvents.push(event);
           }
         }
         else if(event.matched_face.labels.name){
           if(!eventsMap.has(event.matched_face.labels.name)){
               eventsMap.set(event.matched_face.labels.name, true);
+              uniqueEvents.push(event);
           }
         }
         else if(event.matched_face.labels.fio && !event.matched_face.labels.name){
           if(!eventsMap.has(event.matched_face.labels.fio)){
             eventsMap.set(event.matched_face.labels.fio, true);
+            uniqueEvents.push(event);
           }
         }
       }
     }
   }
-  uniqueEvents = eventsMap.size;
 
   return uniqueEvents;
 }
@@ -189,7 +193,7 @@ const updateDays = (groups, startDate, endDate) => {
     date1 = new Date(startDate);
     date2 = new Date(endDate);
     for (let date = date1; date < date2; date.setDate(date.getDate() + 1)) {
-      let day = {events: [], uniqueEvents: 0, faces: []};
+      let day = {events: 0, uniqueEvents: 0, faces: 0};
       let nextDay = new Date(date);
       nextDay.setDate(date.getDate() + 1);
       nextDay.setHours(0);
@@ -198,12 +202,23 @@ const updateDays = (groups, startDate, endDate) => {
       for(let event of group.events){
         let eventDate = new Date(event.face.timestamp);
         if(eventDate >= date && eventDate < nextDay){
-          day.events.push(event);
+          day.events++;
+        }
+      }
+      for(let event of group.uniqueEvents){
+        let eventDate = new Date(event.face.timestamp);
+        if(eventDate >= date && eventDate < nextDay){
+          day.uniqueEvents++;
+        }
+      }
+      for(let face of group.uniqueFaces.faces){
+        let faceDate = new Date(face.timestamp);
+        if(faceDate < nextDay){
+          day.faces++;
         }
       }
       day.date = date.toLocaleDateString('ru-RU').split(' ')[1];
       group.days.push(day);
-      day.uniqueEvents = getUniqueEvents(day.events);               
     }
   })
 }

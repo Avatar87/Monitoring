@@ -56,6 +56,7 @@ const writeFunction = () => {
                                 console.log('writing done!');
                                 db.close();
                             });
+                            fs.writeFileSync('./logs/lastupdate.log', new Date().toLocaleString());
                         }
                         else{
                             console.log(monitoring+': no faces found');
