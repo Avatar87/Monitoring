@@ -192,10 +192,11 @@ const getData = () => {
 
   let lastUpdated;
   fs.readFile('./logs/lastupdate.log', 'utf8', (err, data) => {
-    if (err) throw err;
-    let updateDate = new Date(data);
-    let result = updateDate.getHours()+':'+updateDate.getMinutes()+' '+leadingZero(updateDate.getDate())+'.'+leadingZero(updateDate.getMonth())+'.'+updateDate.getFullYear()
-    lastUpdated = result;
+    if(data){
+      let updateDate = new Date(data);
+      let result = updateDate.getHours()+':'+updateDate.getMinutes()+' '+leadingZero(updateDate.getDate())+'.'+leadingZero(updateDate.getMonth() + 1)+'.'+updateDate.getFullYear();
+      lastUpdated = result;
+    }
   });
 
   request('http://localhost:8888/api/groups/').
