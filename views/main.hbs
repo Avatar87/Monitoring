@@ -75,14 +75,129 @@
                 return date;
             }
 
+            function leadingZero (number) {
+                return (number < 10 ? '0' : '') + number;
+            }
+
             $('.visualization-toggle').click (function(){
-                $(this).siblings('.chart').toggleClass('visible');
                 $(this).children('.toggle-chart').toggleClass('toggled');
-                $(this).siblings('.legend').toggleClass('seen');
-                $(this).siblings('.axisnames').toggleClass('seen');
+                $(this).siblings('.visualization-data').children('.preview-container').toggleClass('seen');
+                $(this).siblings('.visualization-data').children('.legend').toggleClass('seen');
+                $(this).siblings('.visualization-data').children('.vis').toggleClass('seen');
+                $(this).siblings('.visualization-data').children('.axisnames').toggleClass('seen');
+                $(this).siblings('.visualization-data').children('.dates').toggleClass('seen');
+                $(this).siblings('.visualization-data').children('.selector-container').toggleClass('seen');
+                $(this).siblings('.visualization-data').children('.chart').toggleClass('visible');
                 $(this).toggleClass('toggled');
             });
-        });
+
+            $(".faces").each(function() {
+                var toFormat = $(this).html();
+                $(this).html(formatNumber(toFormat));
+            });
+            $(".photos").each(function() {
+                var toFormat = $(this).html().replace(/\D/g,'');
+                $(this).html('('+formatNumber(toFormat)+ ' фото)');
+            });
+            $(".uniquevents").each(function() {
+                var toFormat = $(this).html();
+                $(this).html(formatNumber(toFormat));
+            });
+            $(".events").each(function() {
+                var toFormat = $(this).html();
+                $(this).html(formatNumber(toFormat));
+            });
+            
+
+            var date = new Date();
+            var monthAgo = new Date().getMonth() - 1;
+            date.setMonth(monthAgo);
+            var startDate = date;
+            var endDate = new Date();
+
+            for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+                var datespan = document.createElement("span");
+                datespan.innerText = leadingZero(date.getDate())+'.'+leadingZero(date.getMonth()+1);
+                $(".dates").append(datespan);
+            }
+
+                var url = 'http://'+window.location.host+'/api/groupdays';
+                fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    //'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    redirect: 'follow',
+                    referrerPolicy: 'no-referrer'
+                })
+                .then(response => {  
+                    if (response.status !== 200) {  
+                    console.log('Looks like there was a problem. Status Code: ' +  
+                        response.status);  
+                    return;  
+                    }
+                    response.json().then(function(data) {
+                        localStorage.setItem("groupdays", JSON.stringify(data.groupdays));
+                    });
+                });
+
+                url = 'http://'+window.location.host+'/api/groups';
+                fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    //'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    redirect: 'follow',
+                    referrerPolicy: 'no-referrer'
+                })
+                .then(response => {  
+                    if (response.status !== 200) {  
+                    console.log('Looks like there was a problem. Status Code: ' +  
+                        response.status);  
+                    return;  
+                    }
+                    response.json().then(function(data) {
+                        localStorage.setItem("groups", JSON.stringify(data.groups));
+                    });
+                });
+        })
+
+        function formatNumber(num){
+            if(typeof num == 'number'){
+                num = num.toString();
+            }
+            if(num.length > 0 && num.length < 4){
+                return num;
+            }
+            if(num.length == 4){
+                var numArray = num.split('');
+                numArray.splice(1, 0, ' ');
+            }
+            if(num.length == 5){
+                var numArray = num.split('');
+                numArray.splice(2, 0, ' ');
+            }
+            if(num.length == 6){
+                var numArray = num.split('');
+                numArray.splice(3, 0, ' ');
+            }
+            if(num.length == 7){
+                var numArray = num.split('');
+                numArray.splice(5, 0, ' ');
+                numArray.splice(1, 0, ' ');
+            }
+
+            return numArray.join('');
+        }
+
+        
+        function leadingZero(number) {
+            return (number < 10 ? '0' : '') + number;
+        }
 
     </script>
 </head>
@@ -91,9 +206,11 @@
     <div class="container">
     <div class="header">
         <div class="date-picker">
-            <input class="picker" type="text" id="from" name="from" value="{{fromdate}}">
+            <input class="picker" type="text" id="from" name="from" value="{{splitDate fromdate}}">
+            <div style="display:none;" id="fromyear">{{getDateYear fromdate}}</div>
             <div class="dash"></div>
-            <input class="picker" type="text" id="to" name="to" value="{{todate}}">
+            <input class="picker" type="text" id="to" name="to" value="{{splitDate todate}}">
+            <div style="display:none;" id="toyear">{{getDateYear todate}}</div>
         </div>
         <div class="all-period">
             <div class="checkbox">
@@ -116,36 +233,34 @@
                         </span><br>
                         <div class="line-through"></div>
                         <div class="data-sections">
-                            <div class="data-section" {{#if displayAll}} style="height: 208px;" {{/if}}>
-                                <span class="data-value">{{uniqueFaces.faces.length}}</span>
+                            <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
+                                <span class="faces data-value">{{uniqueFaces.faces.length}}</span>
                                 <span class="data-description">уникальных лиц</span>
-                                <span class="data-add-info">({{photos}} фото)</span>
-                                {{#if lastUpdated}}
-                                <span class="data-add-info">на момент {{lastUpdated}}</span>
-                                {{else}}
-                                <span class="data-add-info">данные не обновлялись</span>
+                                <span class="photos data-add-info">({{uniqueFaces.photos}} фото)</span>
+                                {{#if endDate}}
+                                <span class="enddate data-add-info">на момент {{../lastUpdate}}</span>
                                 {{/if}}
                                 <div class="data-next"><img src="images/arrow.png"/></div>
                             </div>
-                            <div class="data-section" {{#if displayAll}} style="height: 208px; padding: 16px;" {{/if}}>
+                            <div class="data-section" {{#if ../displayAll}} style="height: 208px; padding: 16px;" {{/if}}>
                                 <div class="data-subsection">
-                                    <div class="data-wrap" {{#if displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
-                                        <span class="data-value" {{#if displayAll}} style="margin-right: 5px;" {{/if}}>{{uniqueEvents.length}}</span>
+                                    <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                        <span class="uniquevents data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{uniqueEvents.length}}</span>
                                         <span class="data-description">сработок</span>
                                     </div>
-                                    <span class="data-add-info">(по уникальным лицам{{#if displayAll}} c {{startDate}} по {{endDate}}{{/if}})</span>
+                                    <span class="data-add-info">(по уникальным лицам{{#if ../displayAll}} c <span class="uniqueventsfrom">{{splitDate startDate}}</span> по <span class="uniqueventsto">{{splitDate endDate}}</span>{{/if}})</span>
                                 </div>
                                 <div class="data-subsection">
-                                    <div class="data-wrap" {{#if displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
-                                        <span class="data-value" {{#if displayAll}} style="margin-right: 5px;" {{/if}}>{{events.length}}</span>
+                                    <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                        <span class="events data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{events.length}}</span>
                                         <span class="data-description">сработок</span>
                                     </div>
-                                    <span class="data-add-info">(всего{{#if displayAll}} c {{startDate}} по {{endDate}}{{/if}})</span>
+                                    <span class="data-add-info">(всего{{#if ../displayAll}} c <span class="eventsfrom">{{splitDate startDate}}</span> по <span class="eventsto">{{splitDate endDate}}</span>{{/if}})</span>
                                 </div>
-                                {{#if displayAll}}
+                                {{#if ../displayAll}}
                                 <div class="data-subsection">
-                                    <div class="data-wrap" {{#if displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
-                                        <span class="data-value" {{#if displayAll}} style="margin-right: 5px;" {{/if}}>{{totalevents.length}}</span>
+                                    <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                        <span class="data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{totalevents.length}}</span>
                                         <span class="data-description">сработок</span>
                                     </div>
                                     <span class="data-add-info">(за весь период)</span>
@@ -153,7 +268,7 @@
                                 {{/if}}
                                 <div class="data-next"><img src="images/arrow.png"/></div>
                             </div>
-                            <div class="data-section" {{#if displayAll}} style="height: 208px;" {{/if}}>
+                            <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
                                 <div class="data-subsection">
                                     <div class="data-row">
                                         <div class="data-icon"><img src="images/minus.png" class="cross"/><img src="images/minus.png" class="vertical"/></div>
@@ -183,7 +298,7 @@
                                 </div>
                                 <div class="data-next"><img src="images/arrow.png"/></div>
                             </div>
-                            <div class="data-section" {{#if displayAll}} style="height: 208px;" {{/if}}>
+                            <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
                                 <div class="data-row">
                                     <div class="data-icon"><img src="images/tick.png" class="central"/></div>
                                     <div class="data-column">
@@ -196,6 +311,19 @@
                             <div class="visualization">
                                 <div class="visualization-toggle">
                                     <img src="images/toggle.png" class="toggle-chart"/><span>Визуализация</span>
+                                </div>
+                                <div class="visualization-data">
+                                <div class="dates">
+
+                                </div>
+                                <div class="preview-container">
+                                    <div class="chart-preview"></div>
+                                </div>                            
+                                <div class="selector-container">
+                                    <div class="date-selector">
+                                        <div class="circle-left" group-id="{{title}}" onmousedown="dragFunction(event, this)"></div>
+                                        <div class="circle-right" group-id="{{title}}" onmousedown="dragFunction(event, this)"></div>
+                                    </div>
                                 </div>
                                 <div class="axisnames">
                                     <div class="axisname"><span class="firstaxis">Лица</span></div>
@@ -217,6 +345,7 @@
                                     <div class="checkbox-legend checkbox-yellow">
                                         <input type="checkbox" id="events-box-{{title}}" name="events-box" value="1" checked>
                                         <label for="events-box-{{title}}" id="events-box-label-{{title}}"><span>сработки</span></label>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -242,13 +371,37 @@
                             {{/each}}
 
                             data.addRows(rows);
+                            
+                            var formatter = new google.visualization.NumberFormat({negativeColor: 'red', groupingSymbol: ' ', fractionDigits: 0});
+                            formatter.format(data, 0);
+                            formatter.format(data, 1);
+                            formatter.format(data, 2);
+                            formatter.format(data, 3);
+
+                            var firstAxisTicks = [];
+                            var firstAxisRange = data.getColumnRange(1);
+                            for (var i = firstAxisRange.min; i <= firstAxisRange.max; i=i+1000) {
+                                firstAxisTicks.push({
+                                    v: i,
+                                    f: formatter.formatValue(i)
+                                });
+                            }
+
+                            var secondAxisTicks = [];
+                            var secondAxisRange = data.getColumnRange(2);
+                            for (var i = secondAxisRange.min; i <= secondAxisRange.max; i=i+100) {                               
+                                secondAxisTicks.push({
+                                    v: i,
+                                    f: formatter.formatValue(i)
+                                });
+                            }
 
                             var options = {
                                 chart: {
                                 title: 'Events and faces',
                                 subtitle: 'grouped by days'
                                 },
-                                width: 1424,
+                                width: 1600,
                                 height: 400,
                                 tooltip: {
                                     textStyle: { 
@@ -294,9 +447,10 @@
                                             fontName: 'Roboto',
                                             fontSize: 12,
                                             bold: false,
-                                            italic: false
+                                            italic: false,
                                         },
-                                        //titleTextStyle: {
+                                        ticks: firstAxisTicks
+                                            //titleTextStyle: {
                                             //color: '#7B7F9E',
                                             //fontName: 'Roboto',
                                             //fontSize: 14,
@@ -313,6 +467,7 @@
                                             bold: false,
                                             italic: false
                                         },
+                                        ticks: secondAxisTicks
                                         //titleTextStyle: {
                                             //color: '#7B7F9E',
                                             //fontName: 'Roboto',
@@ -326,7 +481,61 @@
                             };
 
                             var chart = new google.visualization.LineChart(document.getElementById('{{title}}'));
+
                             chart.draw(data, options);
+
+                            var prevOptions = {
+                                chart: {
+                                title: 'Events and faces',
+                                subtitle: 'preview'
+                                },
+                                width: 1600,
+                                height: 75,
+                                tooltip: {
+                                    trigger: 'none'                                  
+                                },
+                                legend: 'none',
+                                colors: ['#cccccc', '#cccccc', '#cccccc'],   
+                                series: {
+                                    0: {targetAxisIndex: 0},
+                                    1: {targetAxisIndex: 1},
+                                    2: {targetAxisIndex: 1}
+                                },
+                                hAxis: {
+                                    baselineColor: 'transparent',
+                                    gridlineColor: 'transparent',
+                                    textPosition: 'none',
+                                    gridlines: {
+                                        color: 'transparent'
+                                    },
+                                    ticks: []
+                                },
+                                vAxes: {
+                                    0:{
+                                        baselineColor: 'transparent',
+                                        gridlineColor: 'transparent',
+                                        textPosition: 'none',
+                                        gridlines: {
+                                            color: 'transparent'
+                                        },
+                                        ticks: []
+                                    },
+                                    1:{
+                                        baselineColor: 'transparent',
+                                        gridlineColor: 'transparent',
+                                        textPosition: 'none',
+                                        gridlines: {
+                                            color: 'transparent'
+                                        },
+                                        ticks: []
+                                    }
+                                },
+                                backgroundColor: 'transparent'                       
+                            };
+
+                            var prevchart = new google.visualization.LineChart(document.getElementsByClassName('chart-preview')[{{index}}]);
+
+                            prevchart.draw(data, prevOptions);
 
                             function showHideLines(selector){
                                 switch(selector) {

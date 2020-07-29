@@ -10,7 +10,7 @@ const leadingZero = (number) => {
   
 const parseValue = (date) => {
     var dateArray = date.split('.'), result;
-    result = dateArray[2].trim()+'/'+dateArray[1].trim()+'/2020';
+    result = dateArray[2].trim()+'/'+dateArray[1].trim()+'/'+dateArray[3].trim();
     return result;
 }
 
@@ -21,10 +21,15 @@ const parseStartDate = (date) => {
 
 const parseEndDate = (date) => {
   var d = new Date(date);
-  var prevDay = d.getDate() - 1;
-  d.setDate(prevDay);
-  var newDate = new Date(d).toLocaleDateString();
+  // var prevDay = d.getDate() - 1;
+  // d.setDate(prevDay);
+  var newDate = d.toLocaleDateString();
   return newDate.split('. ')[1];
+}
+
+const getDayDate = (date) => {
+  var fullDate = date.toLocaleDateString('ru-RU').split(' ')[1];
+  return fullDate.split('.').slice(0,-1).join('.');
 }
 
 const localeDateStringOverride = (dateObj) => {
@@ -55,7 +60,7 @@ const localeDateStringOverride = (dateObj) => {
       default:
         break;
     }
-    return `${day}${leadingZero(dateObj.getDate())}.${leadingZero(dateObj.getMonth() + 1)}`;
+    return `${day}${leadingZero(dateObj.getDate())}.${leadingZero(dateObj.getMonth() + 1)}.${leadingZero(dateObj.getFullYear())}`;
 }
 
 const ISOStringOverride = (dateObj) => {
@@ -217,8 +222,9 @@ const updateDays = (groups, startDate, endDate) => {
           day.faces++;
         }
       }
-      day.date = date.toLocaleDateString('ru-RU').split(' ')[1];
+      day.date = getDayDate(date);
       group.days.push(day);
+      day = null;
     }
   })
 }
@@ -405,6 +411,7 @@ module.exports = {
     parseValue,
     parseStartDate,
     parseEndDate,
+    getDayDate,
     localeDateStringOverride,
     ISOStringOverride,
     getFacesByPage,

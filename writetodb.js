@@ -23,15 +23,17 @@ var attempts = 0, connectTimer, monitorings = [];
 
 const writeFunction = () => {
     attempts++;
-    console.log(attempts+ 'attempt to connect');
+    console.log(new Date().toLocaleString()+': '+attempts+ 'attempt to connect');
     if(attempts > 10){
         console.log('unable to connect after 10 retries');
+        process.exit(0);
     }
     request(apiUrl+'limits')
     .then(() => {
-        request('http://localhost:8888/api/groups/')
+        request('http://localhost:8888/api/grouplist/')
         .then(response => {
             clearTimeout(connectTimer);
+            console.log('local time: '+new Date().toLocaleString());
             return JSON.parse(response);
         })
         .then(response => {
@@ -77,6 +79,9 @@ const writeFunction = () => {
             else{
                 var prevDay = date1.getDate() - 1;
                 date1.setDate(prevDay);
+                date1.setHours(0);
+                date1.setMinutes(0);
+                date1.setSeconds(0);
                 date2 = new Date();
                 var nextDay = new Date().getDate();
                 date2.setDate(nextDay);

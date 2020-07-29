@@ -6,19 +6,28 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const consolidate = require('consolidate');
 const functions = require('./functions');
-const {leadingZero, parseValue, parseStartDate, parseEndDate, localeDateStringOverride, ISOStringOverride, getUniqueFaces, getUniqueEvents, updateDays, getGlobalStartDate, mustBeAuthenticated} = functions;
+const {leadingZero, parseStartDate, parseEndDate, getDayDate, localeDateStringOverride, ISOStringOverride, getUniqueFaces, getUniqueEvents, getGlobalStartDate} = functions;
 const config = require('./config');
 const {dbUrl} = config;
 const mongo = require('mongodb');
 const MongoClient = mongo.MongoClient;
 const express = require('express');
-const session = require('express-session')
+const session = require('express-session');
+const hbs = require('handlebars');
 const app = express();
 const hour = 60*60000;
 
 app.use(cors());
 app.engine('hbs', consolidate.handlebars);
 app.set('view engine', 'hbs');
+hbs.registerHelper('splitDate', function(date) {
+  var d = date.split('.');
+  return d.slice(0,-1).join('.');
+});
+hbs.registerHelper('getDateYear', function(date) {
+  var d = date.split('.');
+  return d[d.length - 1];
+});
 app.set('views', path.resolve(__dirname, 'views'));
 app.use(express.static(path.resolve(__dirname, 'assets')));
 app.use(cookieParser());
@@ -32,7 +41,7 @@ app.use(session({
 app.use(bodyParser.json());
 
 const passportmodule = require('./passport');
-const {passport, authHandler} = passportmodule;
+const {passport} = passportmodule;
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -44,142 +53,23 @@ Date.prototype.toISOString = function(){
   return ISOStringOverride(this);
 }
 
-var currentFromDate, currentToDate, displayAll = false, groups = [], groupsData, totalfaces = [];
+global.currentFromDate = null; global.currentToDate = null; global.displayAll = false; global.groups = []; global.renderedGroups = []; global.groupsData = fs.readFileSync('groups.json', 'utf8');
 
-try{
-  groupsData = fs.readFileSync('groups.json', 'utf8')
-  let items = JSON.parse(groupsData.toString('utf8').replace(/^\uFEFF/, ''));
-  app.get('/api/groups', (req, res) => {
-    res.status(200).send({
-      success: 'true',
-      message: 'groups retrieved successfully',
-      items
-    })
-  });
-}
-catch (err) {
-  console.error(err);
-}
-
-app.get('/auth', (req, res) => {
-  if(req.user === 'notfound'){
-    req.session.destroy();
-  }
-  res.render('loginform', {displayError: req.user === 'notfound'});
-});
-
-app.post('/auth', authHandler);
-
-app.all('/dashboard', mustBeAuthenticated);
-
-app.get('/dashboard', (req, res) => {
-    res.render('main', {groups, fromdate: currentFromDate, todate: currentToDate, displayAll});
-});
-
-app.post('/date', (req, res) => {
-  currentFromDate = req.body.fromdate ? req.body.fromdate : currentFromDate;
-  currentToDate = req.body.todate ? req.body.todate : currentToDate;
-  var date1, date2, endDate, nextDay, startDate;
-
-  if(req.body.fromdate && req.body.todate){
-    date1 = new Date(parseValue(req.body.fromdate));
-    startDate = date1.toISOString();
-    date2 = new Date(parseValue(req.body.todate));
-    nextDay = date2.getDate() + 1;
-    date2.setDate(nextDay);
-    date2.setHours(0);
-    date2.setMinutes(0);
-    date2.setSeconds(0);
-    endDate = date2.toISOString();
-    displayAll = false;
-  }
-  else if(req.body.fromdate){
-    date1 = new Date(parseValue(req.body.fromdate));
-    startDate = date1.toISOString();
-    date2 = new Date(parseValue(currentToDate));
-    nextDay = date2.getDate() + 1;
-    date2.setDate(nextDay);
-    date2.setHours(0);
-    date2.setMinutes(0);
-    date2.setSeconds(0);
-    endDate = date2.toISOString();
-    displayAll = false;
-  }
-  else if(req.body.todate){
-    date1 = new Date(parseValue(currentFromDate));
-    startDate = date1.toISOString();
-    date2 = new Date(parseValue(req.body.todate));
-    nextDay = date2.getDate() + 1;
-    date2.setDate(nextDay);
-    date2.setHours(0);
-    date2.setMinutes(0);
-    date2.setSeconds(0);
-    endDate = date2.toISOString();
-    displayAll = false;
-  }
-  else if(req.body.displayall){
-    date1 = new Date(parseValue(currentFromDate));
-    startDate = date1.toISOString();
-    date2 = new Date(parseValue(currentToDate));
-    nextDay = date2.getDate() + 1;
-    date2.setDate(nextDay);
-    date2.setHours(0);
-    date2.setMinutes(0);
-    date2.setSeconds(0);
-    endDate = date2.toISOString();
-    displayAll = true;
-  }
-
-  console.log('\nshowing events from '+startDate+' to '+endDate);
-
-  MongoClient.connect(dbUrl, function(err, db) {
-    if (err) throw err;
-    let currentDB = db.db('monitoring');
-    let promises = [];
-      groups.forEach((group) => {
-        group.events = [];
-        group.faces = [];
-        group.displayAll = displayAll;
-        group.startDate = parseStartDate(startDate);
-        group.endDate = parseEndDate(endDate);
-        promises.push(currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate}}).
-        toArray().
-          then((items) => {
-            for(let face of items){
-              group.faces.push(face);
-            }
-            console.log(group.title+' faces: '+group.faces.length);
-          }));
-        promises.push(currentDB.collection('events').find({'matched_face.id.monitoring': {$in: group.monitorings}, 'matched_face.labels.status': {$ne: 'cancelled'}, 'face.timestamp': {$lt: endDate, $gte: startDate}}).
-        toArray().
-          then((items) => {
-            for(let event of items){
-              group.events.push(event);
-            }
-            group.uniqueEvents = getUniqueEvents(group.events);
-            console.log(group.title+' events: '+group.events.length);
-            console.log(group.title+' unique events: '+group.uniqueEvents.length);
-          }));
-      })
-      Promise.all(promises).
-      then(() => {
-        updateDays(groups, startDate, endDate);
-        res.send({response: 'success'});
-      });
-  })
-});
+var routes = require('./routes.js');
+app.use(routes);
 
 const getData = () => {
-  groups = [];
+  console.log('global memory usage: '+JSON.stringify(process.memoryUsage()));
   let promises = [];
+  groups = [];
   let date1 = new Date();
   date1.setHours(0);
   date1.setMinutes(0);
   date1.setSeconds(0);
   date1.setMonth(date1.getMonth() - 1);
   let date2 = new Date();
-  let nextDay = new Date().getDate() + 1;
-  date2.setDate(nextDay);
+  // let nextDay = new Date().getDate() + 1;
+  // date2.setDate(nextDay);
   date2.setHours(0);
   date2.setMinutes(0);
   date2.setSeconds(0);
@@ -190,45 +80,48 @@ const getData = () => {
 
   console.log('\nshowing events from '+startDate+' to '+endDate);
 
-  let lastUpdated;
   fs.readFile('./logs/lastupdate.log', 'utf8', (err, data) => {
     if(data){
       let updateDate = new Date(data);
-      let result = updateDate.getHours()+':'+updateDate.getMinutes()+' '+leadingZero(updateDate.getDate())+'.'+leadingZero(updateDate.getMonth() + 1)+'.'+updateDate.getFullYear();
-      lastUpdated = result;
+      global.lastUpdate = leadingZero(updateDate.getHours())+':'+leadingZero(updateDate.getMinutes())+' '+leadingZero(updateDate.getDate())+'.'+leadingZero(updateDate.getMonth() + 1)+'.'+updateDate.getFullYear();
+      console.log('last update: '+lastUpdate);
+    }
+    if(err){
+      console.log('no last update found');
     }
   });
 
-  request('http://localhost:8888/api/groups/').
+  request('http://localhost:8888/api/grouplist/').
     then((response) => JSON.parse(response)).
     then((response) => {
       response.items.forEach((group) => {
-        group.faces = [];
-        group.events = [];
-        group.totalevents = [];
-        group.days = [];
         group.displayAll = displayAll;
         group.startDate = parseStartDate(startDate);
         group.endDate = parseEndDate(endDate);
-        group.lastUpdated = lastUpdated;
         groups.push(group);
       })
     }).
     then(() => {
-      MongoClient.connect(dbUrl, function(err, db) {
-        if (err) throw err;
-        let currentDB = db.db('monitoring');
-        groups.forEach((group) => {
+        groups.forEach((group, index) => {
+          MongoClient.connect(dbUrl, function(err, db) {
+          let currentDB = db.db('monitoring');
+          if (err) throw err;
+          group.events = [];
+          group.uniqueEvents = [];
+          group.faces = [];
+          group.uniqueFaces = [];
+          group.days = [];
+          group.totalevents = [];
           promises.push(currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate}}).
           toArray().
             then((items) => {
               for(let face of items){
-                totalfaces.push(face);
                 group.faces.push(face);
               }
               group.uniqueFaces = getUniqueFaces(group.faces);
-              group.photos = getUniqueFaces(group.faces).photos;
+              group.index = index;
               console.log(group.title+' faces: '+group.faces.length);
+              items = null;
             }));
           promises.push(currentDB.collection('events').find({'matched_face.id.monitoring': {$in: group.monitorings}, 'matched_face.labels.status': {$ne: 'cancelled'}, 'face.timestamp': {$lt: endDate, $gte: globalStartDate}}).
           toArray().
@@ -240,6 +133,7 @@ const getData = () => {
               group.uniqueEvents = getUniqueEvents(group.events);
               console.log(group.title+' events: '+group.events.length);
               console.log(group.title+' unique events: '+group.uniqueEvents.length);
+              items = null;
             }));
           promises.push(currentDB.collection('events').find({'matched_face.id.monitoring': {$in: group.monitorings}, 'matched_face.labels.status': {$ne: 'cancelled'}, 'face.timestamp': {$lt: endDate, $gte: globalStartDate}}).
           toArray().
@@ -270,9 +164,11 @@ const getData = () => {
                       day.uniqueEvents++;
                     }
                   }
-                  day.date = date.toLocaleDateString('ru-RU').split(' ')[1];
+                  day.date = getDayDate(date);
                   group.days.push(day);
+                  day = null;
                 }
+                items = null;
               console.log(group.title+' events: '+group.events.length);
             }).
             then(() => {
@@ -285,7 +181,7 @@ const getData = () => {
                   now.setMinutes(0);
                   now.setSeconds(0);
                   for (var date = new Date(globalStartDate); date <= now; date.setDate(date.getDate() + 1)) {
-                    let day = group.days.find((day) => day.date == date.toLocaleDateString('ru-RU').split(' ')[1])
+                    let day = group.days.find((day) => day.date == getDayDate(date))
                     let nextDay = new Date(date);
                     nextDay.setDate(date.getDate() + 1);
                     nextDay.setHours(0);
@@ -298,16 +194,31 @@ const getData = () => {
                         day.faces++;
                       }
                     }
+                    day = null;
                   }
+                  items = null;
               })
             }));
           Promise.all(promises).
           then(() => {
-             //console.log(group.days)
+              renderedGroups[index] = {
+                title: group.title,
+                uniqueFaces: {faces: group.uniqueFaces.faces.map(face => {return face.timestamp}), photos: group.uniqueFaces.photos},
+                events: group.events.map(event => {return event.face.timestamp}),
+                uniqueEvents: group.uniqueEvents.map(event => {return event.face.timestamp}),
+                totalevents: group.totalevents.length,
+                displayAll: group.displayAll,
+                startDate: group.startDate,
+                endDate: group.endDate,
+                index: group.index
+              };
+              setTimeout(() => {
+                db.close();
+              }, 10000)
           })          
         });
-        console.log('Data retrieved! '+new Date().toTimeString());
     });
+    console.log('Data retrieved! '+new Date().toTimeString());
   });
   var date = new Date();
   var monthAgo = new Date().getMonth() - 1;
@@ -315,9 +226,8 @@ const getData = () => {
   currentFromDate = date.toLocaleDateString('ru-RU');
   currentToDate = new Date().toLocaleDateString('ru-RU');
   displayAll = false;
-  let minute = 60000;
-  setTimeout(getData, minute*15);
-} 
+  setTimeout(getData, hour*2);
+}
 getData();
 
 app.listen(8888, () => {
