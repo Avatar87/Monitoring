@@ -101,37 +101,27 @@ const getData = () => {
   request('http://localhost:8888/api/grouplist/').
     then((response) => JSON.parse(response)).
     then((response) => {
-      response.items.forEach((group) => {
-        let newGroup = new Group();
-        newGroup.title = group.title;
-        newGroup.monitorings = group.monitorings;
-        newGroup.displayAll = displayAll;
-        newGroup.startDate = parseStartDate(startDate);
-        newGroup.endDate = parseEndDate(endDate);
+      response.items.forEach((group, index) => {
+        let newGroup = new Group(index, group.title, group.monitorings, [], [], [], [], [], displayAll, parseStartDate(startDate), parseEndDate(endDate));
         groups.push(newGroup);
       })
     }).
     then(() => {
-        groups.forEach((group, index) => {
+        groups.forEach((group) => {
           MongoClient.connect(dbUrl, function(err, db) {
           let currentDB = db.db('monitoring');
           if (err) throw err;
-          group.events = [];
-          group.uniqueEvents = [];
-          group.faces = [];
-          group.uniqueFaces = [];
-          group.days = [];
-          group.totalevents = [];
           promises.push(currentDB.collection('faces').find({'id.monitoring': {$in: group.monitorings}, 'labels.status': {$ne: 'cancelled'}, 'timestamp': {$lt: endDate}}).
           toArray().
             then((items) => {
+              let faces = [];
               for(let face of items){
-                group.faces.push(face);
+                faces.push(face);
               }
-              group.uniqueFaces = getUniqueFaces(group.faces);
-              group.index = index;
-              console.log(group.title+' faces: '+group.faces.length);
+              group.uniqueFaces = getUniqueFaces(faces);
+              console.log(group.title+' faces: '+faces.length);
               items = null;
+              faces = null;
             }));
           promises.push(currentDB.collection('events').find({'matched_face.id.monitoring': {$in: group.monitorings}, 'matched_face.labels.status': {$ne: 'cancelled'}, 'face.timestamp': {$lt: endDate, $gte: globalStartDate}}).
           toArray().
@@ -211,6 +201,7 @@ const getData = () => {
             }));
           Promise.all(promises).
           then(() => {
+              let index = group.index;
               renderedGroups[index] = {
                 title: group.title,
                 uniqueFaces: {faces: group.uniqueFaces.faces.map(face => { return face.timestamp }), photos: group.uniqueFaces.photos},

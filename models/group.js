@@ -1,5 +1,5 @@
 class Group{
-    constructor(index, title, monitorings, uniqueFaces, events, uniqueEvents, totalevents, displayAll, startDate, endDate) {
+    constructor(index, title, monitorings, uniqueFaces, events, uniqueEvents, totalevents, days, displayAll, startDate, endDate) {
         this._index = index;
         this._title = title;
         this._monitorings = monitorings
@@ -7,6 +7,7 @@ class Group{
         this._events = events;
         this._uniqueEvents = uniqueEvents;
         this._totalevents = totalevents;
+        this._days = days;
         this._displayAll = displayAll;
         this._startDate = startDate;
         this._endDate = endDate;
@@ -66,6 +67,14 @@ class Group{
 
     set totalevents(newEvents){
         this._totalevents = newEvents;
+    }
+
+    get days(){
+        return this._days;
+    }
+
+    set days(newDays){
+        this._days = newDays;
     }
 
     get displayAll(){
