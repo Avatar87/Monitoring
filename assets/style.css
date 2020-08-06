@@ -5,15 +5,69 @@
 
 body{
     background-color: #fdfdfe!important;
+    display: flex;
+}
+
+#aside{
+    position: absolute;
+    height: calc(100% + 5px);
+    z-index: 999;
+    width: 90px;
+    background: #3A4276;
+    border-right: 2px solid rgba(255, 255, 255, 0.2);
+    box-sizing: border-box;
+    box-shadow: 4px 0px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.4s;
+}
+
+#menu{
+    cursor: pointer;
+    width: 24px;
+    height: 16px;
+    margin: 70px 0 68px 32px;
+}
+
+#theme-select{
+    display: none;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.87);
+    height: 56px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.orange-line{
+    width: 4px;
+    height: 100%;
+    background: #FFAC30;
+    margin-right: 28px;
+}
+
+.theme-image{
+    margin-right: 16px;
+}
+
+.theme-title{
+    margin-right: 108px;
+}
+
+#theme-switch{
+    cursor: pointer;
 }
 
 .hero{
     padding-top: 54px;
+    width: 1920px;
+    background-color: #ffffff;
 }
 
 .container{
-    max-width: 1920px;
-
+   max-width: 1920px;
 }
 
 .header{
@@ -372,7 +426,8 @@ body{
     font-size: 24px;
     line-height: 30px;
     letter-spacing: 0.15px;
-    color: rgba(23, 24, 34, 0.87);}
+    color: rgba(23, 24, 34, 0.87);
+}
 
 .data-description{
     font-family: Roboto;
@@ -391,7 +446,7 @@ body{
     font-size: 14px;
     line-height: 21px;
     letter-spacing: 0.25px;
-    color: #7B7F9E;  
+    color: #7B7F9E!important;  
     mix-blend-mode: normal;
 }
 

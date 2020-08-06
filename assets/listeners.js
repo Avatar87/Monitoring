@@ -34,9 +34,9 @@ window.onload = () => {
                 var eventFromSelectors = Array.from(document.getElementsByClassName('eventsfrom'));
 
                 groups.forEach((group) => {
-                  group.uniqueFaces.faces = group.uniqueFaces.faces.filter(face => {return new Date(face) < endDate});
-                  group.events = group.events.filter(event => {return new Date(event) >= startDate && new Date(event) < endDate});
-                  group.uniqueEvents = group.uniqueEvents.filter(event => {return new Date(event) >= startDate && new Date(event) < endDate});
+                  group.uniqueFaces.faces = group.uniqueFaces.faces.filter(face => { return new Date(face) < endDate });
+                  group.events = group.events.filter(event => { return new Date(event) >= startDate && new Date(event) < endDate });
+                  group.uniqueEvents = group.uniqueEvents.filter(event => { return new Date(event) >= startDate && new Date(event) < endDate });
                   facesSelectors[group.index].innerText = formatNumber(group.uniqueFaces.faces.length);
                   eventSelectors[group.index].innerText = formatNumber(group.events.length);
                   uniqueEventSelectors[group.index].innerText = formatNumber(group.uniqueEvents.length);
@@ -90,9 +90,9 @@ window.onload = () => {
               var endDateSelectors = Array.from(document.getElementsByClassName('enddate'));
 
               groups.forEach((group) => {
-                group.uniqueFaces.faces = group.uniqueFaces.faces.filter(face => {return new Date(face) < endDate});
-                group.events = group.events.filter(event => {return new Date(event) >= startDate && new Date(event) < endDate});
-                group.uniqueEvents = group.uniqueEvents.filter(event => {return new Date(event) >= startDate && new Date(event) < endDate});
+                group.uniqueFaces.faces = group.uniqueFaces.faces.filter(face => { return new Date(face) < endDate });
+                group.events = group.events.filter(event => { return new Date(event) >= startDate && new Date(event) < endDate });
+                group.uniqueEvents = group.uniqueEvents.filter(event => { return new Date(event) >= startDate && new Date(event) < endDate });
                 facesSelectors[group.index].innerText = formatNumber(group.uniqueFaces.faces.length);
                 eventSelectors[group.index].innerText = formatNumber(group.events.length);
                 uniqueEventSelectors[group.index].innerText = formatNumber(group.uniqueEvents.length);
@@ -155,6 +155,53 @@ window.onload = () => {
     }
   }, false);
 
+  document.getElementById('menu').addEventListener('click', (e) => {
+    if(e.target.src.includes('/images/menu-closed.png')){
+      e.target.src = '/images/menu-open.png';
+      document.getElementById('aside').style.width = '362px';
+      setTimeout(() => {
+        document.getElementById('theme-select').style.display = 'flex';
+      }, 300)
+    }
+    else{
+      e.target.src = '/images/menu-closed.png';
+      document.getElementById('aside').style.width = '90px';
+      document.getElementById('theme-select').style.display = 'none';
+    }
+  })
+
+  document.getElementById('theme-switch').addEventListener('click', (e) => {
+    if(e.target.src.includes('/images/switch-disabled.png')){
+      localStorage.setItem('theme', 'dark');
+      e.target.src = '/images/switch-enabled.png';
+      document.getElementById('light').disabled = true;
+      document.getElementById('dark').disabled = false;
+    }
+    else{
+      localStorage.setItem('theme', 'light');
+      e.target.src = '/images/switch-disabled.png';
+      document.getElementById('light').disabled = false;
+      document.getElementById('dark').disabled = true;
+    }
+
+  })
+
+  var triggerEvent = function(elem) {
+    var event;
+    if(typeof window.Event == 'function'){
+        event = new Event('click');
+        elem.dispatchEvent(event);
+    } else {
+        event = document.createEvent('HTMLEvents');
+        event.initEvent('click', false, false);
+        elem.dispatchEvent(event);
+    }
+  }
+  
+  if(localStorage.getItem('theme') && localStorage.getItem('theme') == 'dark'){
+    triggerEvent(document.getElementById('theme-switch'));
+  }
+
 }
 
 var dragFunction = function(e, obj){
@@ -167,12 +214,12 @@ var dragFunction = function(e, obj){
   var currentRight = parent.parentElement.style.paddingRight ? parseFloat(parent.parentElement.style.paddingRight) : 0;
   var moveAt = function(e, obj) {
     if(obj){
+        var circleRect = obj.getBoundingClientRect();
         cointainer.childNodes.forEach(el => {
             if(el.className && el.className.includes('dates')){
                 el.childNodes.forEach(child => {
                     if(child.tagName == 'SPAN'){
                         var rect = child.getBoundingClientRect();
-                        var circleRect = obj.getBoundingClientRect();
 
                         if(e.clientX < rect.right && e.clientX > rect.left){
                             child.classList.add('highlight');
@@ -193,10 +240,18 @@ var dragFunction = function(e, obj){
             }
         })
         if(className == 'circle-left'){
-            parent.parentElement.style.paddingLeft = currentLeft + parentWidth + e.pageX - parentRect.right + 'px';
+            var rightCircle = document.getElementsByClassName('circle-right')[0];
+            var rightCircleRect = rightCircle.getBoundingClientRect();
+            if(e.pageX + 1 < rightCircleRect.left){
+              parent.parentElement.style.paddingLeft = currentLeft + parentWidth + e.pageX - parentRect.right + 'px';
+            }
         }
         if(className == 'circle-right'){
-            parent.parentElement.style.paddingRight = currentRight + parentWidth - e.pageX + parentRect.left + 'px';
+            var leftCircle = document.getElementsByClassName('circle-left')[0];
+            var leftCircleRect = leftCircle.getBoundingClientRect();
+            if(e.pageX - 1 > leftCircleRect.right){
+              parent.parentElement.style.paddingRight = currentRight + parentWidth - e.pageX + parentRect.left + 'px';
+            }
         }
     }
   }
@@ -264,8 +319,10 @@ var dragFunction = function(e, obj){
                                   response.json().then(function(data) {  
                                       if(data.response == 'success'){
                                       //document.location.reload();
-                                      var days = data.days;
-
+                                      var darkTheme;
+                                      if(localStorage.getItem('theme') == 'dark'){
+                                          darkTheme = true;
+                                      }
                                       document.getElementById('loader').style.display='none';
                                       var chartData = new google.visualization.DataTable();
                                       chartData.addColumn('string', 'Day');
@@ -293,8 +350,24 @@ var dragFunction = function(e, obj){
 
                                       var firstAxisTicks = [];
                                       var firstAxisRange = chartData.getColumnRange(1);
+                                      var increment;
+                                      if(firstAxisRange.max < 1000){
+                                          increment = 100;
+                                      }
+                                      else if(firstAxisRange.max < 10000){
+                                          increment = 1000;
+                                      }
+                                      else if(firstAxisRange.max < 100000){
+                                          increment = 10000;
+                                      }
+                                      else if(firstAxisRange.max < 1000000){
+                                          increment = 100000;
+                                      }
+                                      else{
+                                          increment = firstAxisRange.max/10;
+                                      }
                                       var i;
-                                      for (i = firstAxisRange.min; i <= firstAxisRange.max; i=i+1000) {
+                                      for (i = 0; i <= firstAxisRange.max; i=i+increment) {
                                           firstAxisTicks.push({
                                               v: i,
                                               f: formatter.formatValue(i)
@@ -317,6 +390,7 @@ var dragFunction = function(e, obj){
                                           },
                                           width: 1600,
                                           height: 400,
+                                          backgroundColor: darkTheme ? '#171822' : '',
                                           tooltip: {
                                               textStyle: { 
                                                   color: '#3A4276',
@@ -397,75 +471,115 @@ var dragFunction = function(e, obj){
                                       var chart = new google.visualization.LineChart(document.getElementById(groupTitle));
                                       chart.draw(chartData, options);
 
-                                      function showHideLines(selector){
+                                      var showHideLines = function(selector){
+                                        var color;
                                         switch(selector) {
-                                            case 'faces':
-                                                var color = options.colors[0];
-                                                if(color === '#FF4C61'){
-                                                    options.colors[0] = "#FFFFFF";
-                                                    options.series[0].lineWidth = 0;
-                                                    options.vAxes[0].textStyle.color = "#FFFFFF";
-                                                    $(".firstaxis").css("color", "#FFFFFF");
-                                                }
-                                                else{
-                                                    options.series[0].lineWidth = 2;
-                                                    options.colors[0] = "#FF4C61";
-                                                    options.vAxes[0].textStyle.color = "#7B7F9E";
-                                                    $(".firstaxis").css("color", "#7B7F9E");
-                                                }
-                                            break;
-        
-                                            case 'events':
-                                                var color = options.colors[1];
-                                                if(color === '#FFB800'){
-                                                    options.colors[1] = "#FFFFFF";
-                                                    options.series[1].lineWidth = 0;
-                                                    if(options.colors[2] === "#FFFFFF"){
-                                                        options.vAxes[1].textStyle.color = "#FFFFFF";
-                                                        $(".secondaxis").css("color", "#FFFFFF");
-                                                    }
-                                                }
-                                                else{
-                                                    options.series[1].lineWidth = 2;
-                                                    options.colors[1] = "#FFB800";
-                                                    options.vAxes[1].textStyle.color = "#7B7F9E";
-                                                    $(".secondaxis").css("color", "#7B7F9E");
-                                                }
-                                            break;
-        
-                                            case 'uniqueEvents':
-                                                var color = options.colors[2];
-                                                if(color === '#58D8F4'){
-                                                    options.series[2].lineWidth = 0;
-                                                    options.colors[2] = "#FFFFFF";
-                                                    if(options.colors[1] === "#FFFFFF"){
-                                                        options.vAxes[1].textStyle.color = "#FFFFFF";
-                                                        $(".secondaxis").css("color", "#FFFFFF");
-                                                    }
-                                                }
-                                                else{
-                                                    options.series[2].lineWidth = 2;
-                                                    options.colors[2] = "#58D8F4";
-                                                    options.vAxes[1].textStyle.color = "#7B7F9E";
-                                                    $(".secondaxis").css("color", "#7B7F9E");
-                                                }
-                                            break;
-        
-                                            default:
-                                                break;
-                                        }
-                                        chart.draw(chartData, options);
+                                          case 'faces':
+                                              color = options.colors[0];
+                                              if(color === '#FF4C61'){
+                                                  options.colors[0] = darkTheme ? '#171822' : '#FFFFFF';
+                                                  options.series[0].lineWidth = 0;
+                                                  options.vAxes[0].textStyle.color = darkTheme ? '#171822' : '#FFFFFF';
+                                                  if(darkTheme){
+                                                      $('.firstaxis').css('color', '#171822');
+                                                  }
+                                                  else{
+                                                      $('.firstaxis').css('color', '#FFFFFF');
+                                                  }
+                                              }
+                                              else{
+                                                  options.series[0].lineWidth = 2;
+                                                  options.colors[0] = '#FF4C61';
+                                                  if(darkTheme){
+                                                      options.vAxes[0].textStyle.color = '#A7ACD3';
+                                                      $('.firstaxis').css('color', '#A7ACD3');
+                                                  }
+                                                  else{
+                                                      options.vAxes[0].textStyle.color = '#7B7F9E';
+                                                      $('.firstaxis').css('color', '#7B7F9E');
+                                                  }
+                                              }
+                                          break;
+  
+                                          case 'events':
+                                              color = options.colors[1];
+                                              if(color === '#FFB800'){
+                                                  options.colors[1] = darkTheme ? '#171822' : '#FFFFFF';
+                                                  options.series[1].lineWidth = 0;
+                                                  if(darkTheme){
+                                                      if(options.colors[2] === '#171822'){
+                                                          options.vAxes[1].textStyle.color = '#171822';
+                                                          $('.secondaxis').css('color', '#171822');
+                                                      }
+                                                  }
+                                                  else{
+                                                      if(options.colors[2] === '#FFFFFF'){
+                                                          options.vAxes[1].textStyle.color = '#FFFFFF';
+                                                          $('.secondaxis').css('color', '#FFFFFF');
+                                                      }
+                                                  }
+                                              }
+                                              else{
+                                                  options.series[1].lineWidth = 2;
+                                                  options.colors[1] = '#FFB800';
+                                                  if(darkTheme){
+                                                      options.vAxes[1].textStyle.color = '#A7ACD3';
+                                                      $('.secondaxis').css('color', '#A7ACD3');
+                                                  }
+                                                  else{
+                                                      options.vAxes[1].textStyle.color = '#7B7F9E';
+                                                      $('.secondaxis').css('color', '#7B7F9E');
+                                                  }
+                                              }
+                                          break;
+  
+                                          case 'uniqueEvents':
+                                              color = options.colors[2];
+                                              if(color === '#58D8F4'){
+                                                  options.series[2].lineWidth = 0;
+                                                  options.colors[2] = '#171822';
+                                                  if(darkTheme){
+                                                      if(options.colors[1] === '#171822'){
+                                                          options.vAxes[1].textStyle.color = '#171822';
+                                                          $('.secondaxis').css('color', '#171822');
+                                                      }                                           
+                                                  }
+                                                  else{
+                                                      if(options.colors[1] === '#FFFFFF'){
+                                                          options.vAxes[1].textStyle.color = '#FFFFFF';
+                                                          $('.secondaxis').css('color', '#FFFFFF');
+                                                      }
+                                                  }
+                                              }
+                                              else{
+                                                  options.series[2].lineWidth = 2;
+                                                  options.colors[2] = '#58D8F4';
+                                                  if(darkTheme){
+                                                      options.vAxes[1].textStyle.color = '#A7ACD3';
+                                                      $('.secondaxis').css('color', '#A7ACD3');
+                                                  }
+                                                  else{
+                                                      options.vAxes[1].textStyle.color = '#7B7F9E';
+                                                      $('.secondaxis').css('color', '#7B7F9E');
+                                                  }
+                                              }
+                                          break;
+  
+                                          default:
+                                              break;
+                                      }
+                                      chart.draw(chartData, options);
                                     }
 
                                     var groups = JSON.parse(localStorage.getItem('groups'));
 
                                     groups.forEach(group => {                                            
-                                      document.getElementById('faces-box-label-'+group.title+'').addEventListener('click', () => {showHideLines('faces')})
-                                      document.getElementById('uniquevents-box-label-'+group.title+'').addEventListener('click', () => {showHideLines('uniqueEvents')})
-                                      document.getElementById('events-box-label-'+group.title+'').addEventListener('click', () => {showHideLines('events')})
+                                      document.getElementById(String('faces-box-label-'+group.title)).addEventListener('click', () => { showHideLines('faces') })
+                                      document.getElementById(String('uniquevents-box-label-'+group.title)).addEventListener('click', () => { showHideLines('uniqueEvents') })
+                                      document.getElementById(String('events-box-label-'+group.title)).addEventListener('click', () => { showHideLines('events') })
                                     })
 
-                                    function handleSelect(){
+                                    var handleSelect = function(){
                                         var targetX = document.getElementsByTagName('circle')[0].getAttribute('cx');
                                         var isFilled = document.getElementsByTagName('circle')[0].getAttribute('fill') !== 'none';
                                         var textCollection = document.getElementsByTagName('text');
@@ -483,7 +597,7 @@ var dragFunction = function(e, obj){
         
                                     google.visualization.events.addListener(chart, 'select', handleSelect);
 
-                                      }
+                                    }
                                   });
                               })
                           }

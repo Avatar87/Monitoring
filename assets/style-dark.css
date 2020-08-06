@@ -1,0 +1,849 @@
+@font-face {
+    font-family: "Roboto";
+    src: url("fonts/Roboto-Regular.ttf");
+}
+
+body{
+    background-color: #fdfdfe!important;
+    display: flex;
+}
+
+#aside{
+    position: absolute;
+    height: calc(100% + 5px);
+    z-index: 999;
+    width: 90px;
+    background-color: #212330;
+    border-right: 2px solid rgba(40, 40, 40, 0.2);
+    box-sizing: border-box;
+    box-shadow: 4px 0px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.4s;
+}
+
+#menu{
+    cursor: pointer;
+    width: 24px;
+    height: 16px;
+    margin: 70px 0 68px 32px;
+}
+
+#theme-select{
+    display: none;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.87);
+    height: 56px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.orange-line{
+    width: 4px;
+    height: 100%;
+    background: #FFAC30;
+    margin-right: 28px;
+}
+
+.theme-image{
+    margin-right: 16px;
+}
+
+.theme-title{
+    margin-right: 108px;
+}
+
+#theme-switch{
+    cursor: pointer;
+}
+
+.hero{
+    padding-top: 54px;
+    width: 1920px;
+    background-color: #171822;
+}
+
+.container{
+   max-width: 1920px;
+}
+
+.header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1600px;
+    margin: 0 auto;
+    margin-bottom: 16px;
+}
+
+.line-through{
+    margin: 30px -56px 23px -56px;
+    height: 2px;
+    background: rgba(58, 66, 118, 0.2);
+}
+
+
+.date-picker{
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+.all-period{
+    display: flex;
+    align-items: center;
+}
+
+.checkbox {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox input[type="checkbox"] {
+    width: auto;
+    opacity: 0.00000001;
+    position: absolute;
+    left: 0;
+    margin-left: -20px;
+}
+.checkbox label {
+    position: relative;
+}
+.checkbox label:before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    margin: 4px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.28s ease;
+    border: 1px solid #3A4276;
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+.checkbox label:after {
+  content: '';
+    display: block;
+    width: 10px;
+    height: 5px;
+    border-bottom: 2px solid #fff;
+    border-left: 2px solid #fff;
+    -webkit-transform: rotate(-45deg) scale(0);
+    transform: rotate(-45deg) scale(0);
+    transition: transform ease 0.25s;
+    will-change: transform;
+    position: absolute;
+    top: 15px;
+    left: 10px;
+}
+.checkbox input[type="checkbox"]:checked ~ label::before {
+    background: #3A4276;
+    color: #fff;
+}
+
+.checkbox input[type="checkbox"]:checked ~ label::after {
+    -webkit-transform: rotate(-45deg) scale(1);
+    transform: rotate(-45deg) scale(1);
+}
+
+.checkbox label {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer;
+    vertical-align: sub;
+}
+.checkbox label span {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.87);;
+    mix-blend-mode: normal;
+}
+.checkbox input[type="checkbox"]:focus + label::before {
+    outline: 0;
+}
+
+.legend{
+    display: none;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    justify-content: center;
+    margin-top: -20px;
+    margin-bottom: 20px;
+}
+.axisnames{
+    display: none;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    width: 1315px;
+    justify-content: space-between;
+    margin-bottom: -100px;
+}
+
+.axisname{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-end;
+    color: #A7ACD3!important;
+    mix-blend-mode: normal;
+    z-index: 10000000000000000000000;
+}
+
+.seen{
+    display: flex!important;
+}
+
+.checkbox-legend {
+    width: auto;
+    margin: 0 10px 0 10px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    z-index: 10000000000000000000000;
+}
+
+.checkbox-legend input[type="checkbox"] {
+    width: auto;
+    opacity: 0.00000001;
+    position: absolute;
+    left: 0;
+    margin-left: -20px;
+}
+.checkbox-legend label {
+    position: relative;
+}
+.checkbox-red label:before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    margin: 4px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.28s ease;
+    border: 1px solid #FF4C61;
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+.checkbox-legend label:after {
+    content: '';
+    display: block;
+    width: 10px;
+    height: 5px;
+    border-bottom: 2px solid #fff;
+    border-left: 2px solid #fff;
+    -webkit-transform: rotate(-45deg) scale(0);
+    transform: rotate(-45deg) scale(0);
+    transition: transform ease 0.25s;
+    will-change: transform;
+    position: absolute;
+    top: 15px;
+    left: 10px;
+}
+.checkbox-red input[type="checkbox"]:checked ~ label::before {
+    background: #FF4C61;
+    color: #fff;
+}
+
+.checkbox-legend input[type="checkbox"]:checked ~ label::after {
+    -webkit-transform: rotate(-45deg) scale(1);
+    transform: rotate(-45deg) scale(1);
+}
+
+.checkbox-legend label {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer;
+    vertical-align: sub;
+}
+.checkbox-legend label span {
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 21px;
+    display: flex;
+    align-items: center;
+    color: #A7ACD3;
+    mix-blend-mode: normal;
+}
+.checkbox-legend input[type="checkbox"]:focus + label::before {
+    outline: 0;
+}
+
+.checkbox-blue label:before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    margin: 4px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.28s ease;
+    border: 1px solid #58D8F4;
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+
+.checkbox-blue input[type="checkbox"]:checked ~ label::before {
+    background: #58D8F4;
+    color: #fff;
+}
+
+.checkbox-yellow label:before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    margin: 4px;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.28s ease;
+    border: 1px solid #FFB800;;
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+
+.checkbox-yellow input[type="checkbox"]:checked ~ label::before {
+    background: #FFB800;;
+    color: #fff;
+}
+
+.picker{
+    width: 192px;
+    height: 40px;
+    background-color: #171822;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: rgba(255, 172, 48, 0.87);
+    border: none;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+#loader{
+    display: none;
+    position: fixed;
+    top: 40%;
+    left: 48%;
+    z-index: 9999999999999999999;
+}
+
+.dash{
+    width: 16px;
+    height: 3px;
+    background: rgba(123, 127, 158, 0.87);
+    display: flex;
+    margin: 0 8px 0 8px;
+}
+
+.monitoring-group{
+    margin: 0 auto;
+    margin-bottom: 48px;
+    padding: 26px 56px 26px 56px;
+    max-width: 1600px;
+    min-height: 376px;
+    background-color: #FFFFFF;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 24px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background-color: #171822;
+}
+
+.group-title{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 28px;
+    line-height: 30px;
+    align-items: center;
+    letter-spacing: 0.15px;
+    color: rgba(255, 255, 255, 0.87);
+}
+
+.data-wrap{
+    display: flex;
+    flex-direction: column;
+}
+
+.data-sections{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.data-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 336px;
+    height: 184px;
+    background-color: #212330;
+    border: 2px solid rgba(58, 66, 118, 0.03);
+    box-sizing: border-box;
+    border-radius: 12px;
+    padding: 14px 24px 14px 24px;
+    border: 2px solid rgba(255, 255, 255, 0.03);
+}
+
+.data-subsection{
+    display: flex;
+    flex-direction: column;
+    margin: 6px 0 6px 0;
+}
+
+.data-value{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 30px;
+    letter-spacing: 0.15px;
+    color: rgba(255, 255, 255, 0.87);
+}
+
+.data-description{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0.25px;   
+    color: rgba(255, 255, 255, 0.87);
+}
+
+.data-add-info{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 21px;
+    letter-spacing: 0.25px;
+    color: rgba(255, 255, 255, 0.87);
+    mix-blend-mode: normal;
+}
+
+.data-next{   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 0 0 3px;
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    margin-left: 287px;
+    background-color: #171822;
+    background-image: url('images/circle-dark.jpg');
+    background-position: 50%;
+    background-size: auto;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+}
+
+.data-icon{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 172, 48, 0.87);
+    border-radius: 50%;
+    margin-right: 20px;
+    color: #1B1D28;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.cross{
+    width: 2px;
+    height: 14px;
+    transform: rotate(90deg);
+}
+
+.vertical{
+    width: 2px;
+    height: 14px;
+    margin-left: -2px;
+}
+
+.central{
+    margin-left: 2px;
+}
+
+.data-row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.data-column{
+    display: flex;
+    flex-direction: column;
+}
+
+.data-column span{
+    margin: -2px 0 -2px 0;
+}
+
+p{
+    text-align: center;
+}
+
+p img{
+    max-width: 40px;
+    max-height: 40px;
+    cursor: pointer;
+}
+
+.ui-datepicker{
+    background-color: #fff!important;
+}
+
+.chart{
+    visibility: hidden;
+    height: 0px;
+}
+
+.visible{
+    height: 400px;
+}
+
+.visualization-toggle{
+    display: flex;
+    align-items: center;
+    margin-top: 28px;
+    cursor: pointer;
+    width: 170px;
+}
+
+.toggle-chart.toggled{
+    transform: rotate(180deg);
+}
+
+.visualization{
+    display: flex;
+    flex-direction: column;
+}
+
+.visualization-data{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.visualization-toggle.toggled{
+    margin-bottom: 40px;
+}
+
+.visualization-toggle span{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 21px;
+    margin-left: 12px;
+    color: rgba(255, 172, 48, 0.87);
+}
+
+.dates{
+    display: none;
+    width: 1392px;
+    align-items: center;
+    justify-content: space-between;
+    color: #7B7F9E;
+    margin-bottom: 25px;
+}
+
+.dates span{
+    width: 40px;
+    text-align: center;
+    border-radius: 1px;
+}
+
+.highlight{
+    background-color: #d5d5d5;
+}
+
+.selector-container{
+    display: none;
+    width: 1392px;
+    align-items: center;
+    background-color: #171822;
+    box-sizing: border-box;
+    height: 75px;
+    z-index: 1000;
+    margin-bottom: 20px;
+    border-top: 2px solid rgba(58, 66, 118, 0.03);
+    border-right: 1px solid rgba(58, 66, 118, 0.03);
+    border-bottom: 2px solid rgba(58, 66, 118, 0.03);
+    border-left: 1px solid rgba(58, 66, 118, 0.03);
+}
+
+.preview-container{
+    display: none;
+    margin-bottom: -70px;
+    height: 75px;
+    width: 1392px;
+    z-index: 9999999999999999999999999999;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.chart-preview{
+    width: 1392px;
+    display: flex;
+    justify-content: center;
+
+}
+
+.date-selector{
+    width: 1392px;
+    height: 75px;
+    background: #171822;
+    border: 2px solid#FFAC30;
+    box-sizing: border-box;
+    margin-bottom: 0px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.circle-left{
+    width: 12px;
+    height: 12px;
+    margin-left: -7px;
+    border-radius: 50%;
+    background: #FFAC30;
+    cursor: pointer;
+    z-index: 10000000;
+}
+
+.circle-right{
+    width: 12px;
+    height: 12px;
+    margin-right: -7px;
+    right: -10px;
+    border-radius: 50%;
+    background: #FFAC30;
+    cursor: pointer;
+    z-index: 10000000;
+}
+
+.ui-datepicker {
+    margin: 5px auto 0;
+    font-family: Roboto;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, .5);
+    text-align: center;
+    width: 352px!important;
+    height: 368px!important;
+    background: #FFFFFF;
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
+    border: none!important;
+    border-radius: 20px!important;
+}
+
+.ui-datepicker table {
+    width: 100%;
+}
+
+.ui-datepicker-header {
+    margin-top: 10px!important;
+    background: transparent!important;
+    color: #ffffff;
+    font-family: Roboto;
+    border: none!important;
+}
+
+.ui-datepicker-title {
+    text-align: center;
+    font-size: 15px;
+}
+
+.ui-datepicker th{
+    text-transform: none!important;
+    font-family: Roboto!important;
+    font-style: normal!important;
+    font-weight: normal!important;
+    font-size: 20px!important;
+    color: #7B7F9E!important;
+}
+
+select {
+    width: 45px!important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+}
+
+.ui-datepicker-month{
+    font-family: Roboto!important;
+    border: none;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold!important;
+    font-size: 16px!important;
+    line-height: 21px!important;
+    color: #3A4276!important;
+}
+
+.ui-datepicker-year{
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold!important;
+    font-size: 16px!important;
+    line-height: 21px!important;
+    color: #3A4276!important;
+}
+
+.ui-datepicker-prev {
+    float: left;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.ui-datepicker-next {
+    float: right;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.ui-datepicker thead {
+    background-color: #f7f7f7;
+
+    /*border-bottom: 1px solid #bbb;*/
+}
+
+.ui-datepicker th {
+    background-color:#fff;
+    text-transform: uppercase;
+    font-size: 8pt;
+    color: #666666;
+    /*text-shadow: 1px 0px 0px #fff;*/
+    /*filter: dropshadow(color=#fff, offx=1, offy=0);*/
+}
+
+
+.ui-datepicker tbody td {
+    padding: 0;
+    text-align: center;
+    width: 46px!important;
+    height: 46px!important;
+}
+
+    .ui-datepicker tbody td:last-child {
+        border-right: 0px;
+    }
+
+    .ui-datepicker tbody tr:last-child {
+        border-bottom: 0px;
+    }
+
+.ui-datepicker a {
+    text-decoration: none;
+    display: flex!important;
+    align-items: center!important;
+    justify-content: center!important;
+}
+
+.ui-datepicker td span, .ui-datepicker td a {
+    font-family: Roboto!important;
+    display: inline-block;
+    font-weight: bold;
+    text-align: center!important;
+    width: 100%;
+    height: 100%;
+    line-height: 30px;
+    color: #ffffff;
+    text-shadow: 1px 1px 0px #fff;
+    filter: dropshadow(color=#fff, offx=1, offy=1);
+}
+
+.ui-datepicker-calendar .ui-state-default {
+    font-family: Roboto!important;
+    font-style: normal!important;
+    font-weight: bold!important;
+    font-size: 16px!important;
+    color: #3A4276!important;
+    border: none!important;
+    background-color: #FFFFFF!important;
+}
+
+.ui-datepicker-calendar .ui-state-hover {
+    background: #33adff;
+    color: #FFFFFF;
+}
+
+.ui-datepicker-calendar .ui-state-active {
+    background: #FFA51F!important;
+    border-radius: 50%!important;
+    -webkit-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+    -moz-box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+    box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, .1);
+    color: #fff!important;
+    text-shadow: 0px 1px 0px #4d7a85;
+    border: 2px solid #FFF27E!important;
+    position: relative;
+    margin: -1px;
+}
+
+.ui-datepicker-unselectable .ui-state-default {
+    background: #D6E4BE;
+    color: #000;
+}
+
+.ui-priority-secondary{
+    opacity: 0.5!important;
+}
+
+.ui-datepicker-prev span {
+    background-image: url('images/arrow-blue.png') !important;
+    background-position: center !important;
+}
+
+.ui-datepicker-next span {
+    background-image: url('images/arrow-blue.png') !important;
+    background-position: center !important;
+    transform: rotate(180deg);
+}
+
+.error{
+    display: none;
+    text-align: center;
+    color: red;
+}

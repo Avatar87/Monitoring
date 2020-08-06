@@ -3,7 +3,8 @@
     <base href="/">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
           integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <link rel="stylesheet" type = "text/css" href="style.css">
+    <link rel="stylesheet" type = "text/css" href="style-dark.css" id="dark">
+    <link rel="stylesheet" type = "text/css" href="style.css" id="light">
     <link rel="stylesheet" type = "text/css" href="jquery-ui.min.css">
     <script src="listeners.js"></script>
     <script src="jquery-3.4.1.min.js"></script>
@@ -89,6 +90,15 @@
                 $(this).siblings('.visualization-data').children('.selector-container').toggleClass('seen');
                 $(this).siblings('.visualization-data').children('.chart').toggleClass('visible');
                 $(this).toggleClass('toggled');
+
+                if($(this).hasClass('toggled')){
+                    var startHeight = $('#aside').css("height");
+                    $('#aside').css("height", parseInt(startHeight) + 540 + 'px');
+                }
+                else{
+                    var startHeight = $('#aside').css("height");
+                    $('#aside').css("height", parseInt(startHeight) - 540 + 'px');
+                }
             });
 
             $(".faces").each(function() {
@@ -164,6 +174,7 @@
                         localStorage.setItem("groups", JSON.stringify(data.groups));
                     });
                 });
+
         })
 
         function formatNumber(num){
@@ -202,429 +213,498 @@
     </script>
 </head>
 <body>
-<div class="hero">
-    <div class="container">
-    <div class="header">
-        <div class="date-picker">
-            <input class="picker" type="text" id="from" name="from" value="{{splitDate fromdate}}">
-            <div style="display:none;" id="fromyear">{{getDateYear fromdate}}</div>
-            <div class="dash"></div>
-            <input class="picker" type="text" id="to" name="to" value="{{splitDate todate}}">
-            <div style="display:none;" id="toyear">{{getDateYear todate}}</div>
-        </div>
-        <div class="all-period">
-            <div class="checkbox">
-                {{#if displayAll}}
-                    <input type="checkbox" id="all" name="all" value="1" checked>
-                {{else}}
-                    <input type="checkbox" id="all" name="all" value="1">
-                {{/if}}
-                <label for="all"><span>показывать данные за весь период</span></label>
-            </div>
+    <div id="aside">
+        <img src="images/menu-closed.png" id="menu"/>
+        <div id="theme-select">
+            <div class="orange-line"></div>
+            <img class="theme-image" src="images/theme.png"/>
+            <span class="theme-title">Тёмная тема</span>
+            <img src="images/switch-disabled.png" id="theme-switch"/>
         </div>
     </div>
-        <div class="row">
-            <img src="images/video-loader.gif" id="loader"/>
-            <ul id="list" class="list col-lg-12 col-12 mx-auto">
-                {{#each groups}}
-                    <div class="monitoring-group">
-                        <span class="group-title">
-                            {{title}}
-                        </span><br>
-                        <div class="line-through"></div>
-                        <div class="data-sections">
-                            <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
-                                <span class="faces data-value">{{uniqueFaces.faces.length}}</span>
-                                <span class="data-description">уникальных лиц</span>
-                                <span class="photos data-add-info">({{uniqueFaces.photos}} фото)</span>
-                                {{#if endDate}}
-                                <span class="enddate data-add-info">на момент {{../lastUpdate}}</span>
-                                {{/if}}
-                                <div class="data-next"><img src="images/arrow.png"/></div>
-                            </div>
-                            <div class="data-section" {{#if ../displayAll}} style="height: 208px; padding: 16px;" {{/if}}>
-                                <div class="data-subsection">
-                                    <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
-                                        <span class="uniquevents data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{uniqueEvents.length}}</span>
-                                        <span class="data-description">сработок</span>
-                                    </div>
-                                    <span class="data-add-info">(по уникальным лицам{{#if ../displayAll}} c <span class="uniqueventsfrom">{{splitDate startDate}}</span> по <span class="uniqueventsto">{{splitDate endDate}}</span>{{/if}})</span>
+    <div class="hero">
+        <div class="container">
+        <div class="header">
+            <div class="date-picker">
+                <input class="picker" type="text" id="from" name="from" value="{{splitDate fromdate}}">
+                <div style="display:none;" id="fromyear">{{getDateYear fromdate}}</div>
+                <div class="dash"></div>
+                <input class="picker" type="text" id="to" name="to" value="{{splitDate todate}}">
+                <div style="display:none;" id="toyear">{{getDateYear todate}}</div>
+            </div>
+            <div class="all-period">
+                <div class="checkbox">
+                    {{#if displayAll}}
+                        <input type="checkbox" id="all" name="all" value="1" checked>
+                    {{else}}
+                        <input type="checkbox" id="all" name="all" value="1">
+                    {{/if}}
+                    <label for="all"><span class="all-text">показывать данные за весь период</span></label>
+                </div>
+            </div>
+        </div>
+            <div class="row">
+                <img src="images/video-loader.gif" id="loader"/>
+                <ul id="list" class="list col-lg-12 col-12 mx-auto">
+                    {{#each groups}}
+                        <div class="monitoring-group">
+                            <span class="group-title">
+                                {{title}}
+                            </span><br>
+                            <div class="line-through"></div>
+                            <div class="data-sections">
+                                <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
+                                    <span class="faces data-value">{{uniqueFaces.faces.length}}</span>
+                                    <span class="data-description">уникальных лиц</span>
+                                    <span class="photos data-add-info">({{uniqueFaces.photos}} фото)</span>
+                                    {{#if endDate}}
+                                    <span class="enddate data-add-info">на момент {{../lastUpdate}}</span>
+                                    {{/if}}
+                                    <div class="data-next"><img src="images/arrow.png"/></div>
                                 </div>
-                                <div class="data-subsection">
-                                    <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
-                                        <span class="events data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{events.length}}</span>
-                                        <span class="data-description">сработок</span>
+                                <div class="data-section" {{#if ../displayAll}} style="height: 208px; padding: 16px;" {{/if}}>
+                                    <div class="data-subsection">
+                                        <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                            <span class="uniquevents data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{uniqueEvents.length}}</span>
+                                            <span class="data-description">сработок</span>
+                                        </div>
+                                        <span class="data-add-info">(по уникальным лицам{{#if ../displayAll}} c <span class="uniqueventsfrom">{{splitDate startDate}}</span> по <span class="uniqueventsto">{{splitDate endDate}}</span>{{/if}})</span>
                                     </div>
-                                    <span class="data-add-info">(всего{{#if ../displayAll}} c <span class="eventsfrom">{{splitDate startDate}}</span> по <span class="eventsto">{{splitDate endDate}}</span>{{/if}})</span>
-                                </div>
-                                {{#if ../displayAll}}
-                                <div class="data-subsection">
-                                    <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
-                                        <span class="data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{totalevents.length}}</span>
-                                        <span class="data-description">сработок</span>
+                                    <div class="data-subsection">
+                                        <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                            <span class="events data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{events.length}}</span>
+                                            <span class="data-description">сработок</span>
+                                        </div>
+                                        <span class="data-add-info">(всего{{#if ../displayAll}} c <span class="eventsfrom">{{splitDate startDate}}</span> по <span class="eventsto">{{splitDate endDate}}</span>{{/if}})</span>
                                     </div>
-                                    <span class="data-add-info">(за весь период)</span>
+                                    {{#if ../displayAll}}
+                                    <div class="data-subsection">
+                                        <div class="data-wrap" {{#if ../displayAll}} style="flex-direction: row; align-items: center;" {{/if}}>
+                                            <span class="data-value" {{#if ../displayAll}} style="margin-right: 5px;" {{/if}}>{{totalevents.length}}</span>
+                                            <span class="data-description">сработок</span>
+                                        </div>
+                                        <span class="data-add-info">(за весь период)</span>
+                                    </div>
+                                    {{/if}}
+                                    <div class="data-next"><img src="images/arrow.png"/></div>
                                 </div>
-                                {{/if}}
-                                <div class="data-next"><img src="images/arrow.png"/></div>
-                            </div>
-                            <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
-                                <div class="data-subsection">
+                                <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
+                                    <div class="data-subsection">
+                                        <div class="data-row">
+                                            <div class="data-icon"><img src="images/minus.png" class="cross"/><img src="images/minus.png" class="vertical"/></div>
+                                            <div class="data-column">
+                                                <span class="data-value">11</span>
+                                                <span class="data-description">положительная идентификация</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="data-subsection">
+                                        <div class="data-row">
+                                            <div class="data-icon"><img src="images/unchecked.png"/></div>
+                                            <div class="data-column">
+                                                <span class="data-value">1</span>
+                                                <span class="data-description">не проверены</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="data-subsection">
+                                        <div class="data-row">
+                                            <div class="data-icon"><img src="images/minus.png" class="cross"/></div>
+                                            <div class="data-column">
+                                                <span class="data-value">2</span>
+                                                <span class="data-description">ложные сработки</span>
+                                            </div>
+                                        </div>         
+                                    </div>
+                                    <div class="data-next"><img src="images/arrow.png"/></div>
+                                </div>
+                                <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
                                     <div class="data-row">
-                                        <div class="data-icon"><img src="images/minus.png" class="cross"/><img src="images/minus.png" class="vertical"/></div>
+                                        <div class="data-icon"><img src="images/tick.png" class="central"/></div>
                                         <div class="data-column">
-                                            <span class="data-value">11</span>
-                                            <span class="data-description">положительная идентификация</span>
+                                            <span class="data-value">8</span>
+                                            <span class="data-description">приняты меры</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="data-subsection">
-                                    <div class="data-row">
-                                        <div class="data-icon"><img src="images/unchecked.png"/></div>
-                                        <div class="data-column">
-                                            <span class="data-value">1</span>
-                                            <span class="data-description">не проверены</span>
+                            </div>
+                                <div class="visualization">
+                                    <div class="visualization-toggle">
+                                        <img src="images/toggle.png" class="toggle-chart"/><span class="toggle-chart-text">Визуализация</span>
+                                    </div>
+                                    <div class="visualization-data">
+                                    <div class="dates">
+
+                                    </div>
+                                    <div class="preview-container">
+                                        <div class="chart-preview"></div>
+                                    </div>                            
+                                    <div class="selector-container">
+                                        <div class="date-selector">
+                                            <div class="circle-left" group-id="{{title}}" onmousedown="dragFunction(event, this)"></div>
+                                            <div class="circle-right" group-id="{{title}}" onmousedown="dragFunction(event, this)"></div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="data-subsection">
-                                    <div class="data-row">
-                                        <div class="data-icon"><img src="images/minus.png" class="cross"/></div>
-                                        <div class="data-column">
-                                            <span class="data-value">2</span>
-                                            <span class="data-description">ложные сработки</span>
+                                    <div class="axisnames">
+                                        <div class="axisname"><span class="firstaxis">Лица</span></div>
+
+                                        <div class="axisname"><span class="secondaxis">Сработки</span></div>
+                                    </div>
+                                    <div class="chart" id="{{title}}"></div>
+                                    <div class="legend">
+                                        <div class="checkbox-legend checkbox-red">
+                                            <input type="checkbox" id="faces-box-{{title}}" name="faces-box" value="1" checked>
+                                            <label for="faces-box-{{title}}" id="faces-box-label-{{title}}"><span>лица</span></label>
                                         </div>
-                                    </div>         
-                                </div>
-                                <div class="data-next"><img src="images/arrow.png"/></div>
-                            </div>
-                            <div class="data-section" {{#if ../displayAll}} style="height: 208px;" {{/if}}>
-                                <div class="data-row">
-                                    <div class="data-icon"><img src="images/tick.png" class="central"/></div>
-                                    <div class="data-column">
-                                        <span class="data-value">8</span>
-                                        <span class="data-description">приняты меры</span>
+
+                                        <div class="checkbox-legend checkbox-blue">
+                                            <input type="checkbox" id="uniquevents-box-{{title}}" name="faces-box" value="1" checked>
+                                            <label for="uniquevents-box-{{title}}" id="uniquevents-box-label-{{title}}"><span>уникальные сработки</span></label>
+                                        </div>
+
+                                        <div class="checkbox-legend checkbox-yellow">
+                                            <input type="checkbox" id="events-box-{{title}}" name="events-box" value="1" checked>
+                                            <label for="events-box-{{title}}" id="events-box-label-{{title}}"><span>сработки</span></label>
+                                        </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                            <div class="visualization">
-                                <div class="visualization-toggle">
-                                    <img src="images/toggle.png" class="toggle-chart"/><span>Визуализация</span>
-                                </div>
-                                <div class="visualization-data">
-                                <div class="dates">
+                        <script type="text/javascript">
+                            // Load google charts
+                            google.charts.load('current', {'packages':['corechart', 'line']});
+                            google.charts.setOnLoadCallback(drawChart);
 
-                                </div>
-                                <div class="preview-container">
-                                    <div class="chart-preview"></div>
-                                </div>                            
-                                <div class="selector-container">
-                                    <div class="date-selector">
-                                        <div class="circle-left" group-id="{{title}}" onmousedown="dragFunction(event, this)"></div>
-                                        <div class="circle-right" group-id="{{title}}" onmousedown="dragFunction(event, this)"></div>
-                                    </div>
-                                </div>
-                                <div class="axisnames">
-                                    <div class="axisname"><span class="firstaxis">Лица</span></div>
+                            // Draw the chart and set the chart values
+                            function drawChart() {
+                                var darkTheme;
+                                if(localStorage.getItem('theme') == 'dark'){
+                                    darkTheme = true;
+                                }
+                                var data = new google.visualization.DataTable();
+                                data.addColumn('string', 'Day');
+                                data.addColumn('number', 'лица');
+                                data.addColumn('number', 'сработки');
+                                data.addColumn('number', 'уникальные сработки');
 
-                                    <div class="axisname"><span class="secondaxis">Сработки</span></div>
-                                </div>
-                                <div class="chart" id="{{title}}"></div>
-                                <div class="legend">
-                                    <div class="checkbox-legend checkbox-red">
-                                        <input type="checkbox" id="faces-box-{{title}}" name="faces-box" value="1" checked>
-                                        <label for="faces-box-{{title}}" id="faces-box-label-{{title}}"><span>лица</span></label>
-                                    </div>
+                                var rows = [];
+                                
+                                {{#each days}}
+                                    rows.push(['{{date}}', {{faces}}, {{events}}, {{uniqueEvents}}])
+                                {{/each}}
 
-                                    <div class="checkbox-legend checkbox-blue">
-                                        <input type="checkbox" id="uniquevents-box-{{title}}" name="faces-box" value="1" checked>
-                                        <label for="uniquevents-box-{{title}}" id="uniquevents-box-label-{{title}}"><span>уникальные сработки</span></label>
-                                    </div>
+                                data.addRows(rows);
+                                
+                                var formatter = new google.visualization.NumberFormat({negativeColor: 'red', groupingSymbol: ' ', fractionDigits: 0});
+                                formatter.format(data, 0);
+                                formatter.format(data, 1);
+                                formatter.format(data, 2);
+                                formatter.format(data, 3);
 
-                                    <div class="checkbox-legend checkbox-yellow">
-                                        <input type="checkbox" id="events-box-{{title}}" name="events-box" value="1" checked>
-                                        <label for="events-box-{{title}}" id="events-box-label-{{title}}"><span>сработки</span></label>
-                                    </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <script type="text/javascript">
-                        // Load google charts
-                        google.charts.load('current', {'packages':['corechart', 'line']});
-                        google.charts.setOnLoadCallback(drawChart);
+                                var firstAxisTicks = [];
+                                var firstAxisRange = data.getColumnRange(1);
+                                var increment;
+                                if(firstAxisRange.max < 1000){
+                                    increment = 100;
+                                }
+                                else if(firstAxisRange.max < 10000){
+                                    increment = 1000;
+                                }
+                                else if(firstAxisRange.max < 100000){
+                                    increment = 10000;
+                                }
+                                else if(firstAxisRange.max < 1000000){
+                                    increment = 100000;
+                                }
+                                else{
+                                    increment = firstAxisRange.max/10;
+                                }
+                                for (var i = 0; i <= firstAxisRange.max; i=i+increment) {
+                                    firstAxisTicks.push({
+                                        v: i,
+                                        f: formatter.formatValue(i)
+                                    });
+                                }
 
-                        // Draw the chart and set the chart values
-                        function drawChart() {
-                            var data = new google.visualization.DataTable();
-                            data.addColumn('string', 'Day');
-                            data.addColumn('number', 'лица');
-                            data.addColumn('number', 'сработки');
-                            data.addColumn('number', 'уникальные сработки');
+                                var secondAxisTicks = [];
+                                var secondAxisRange = data.getColumnRange(2);
+                                for (var i = secondAxisRange.min; i <= secondAxisRange.max; i=i+100) {                               
+                                    secondAxisTicks.push({
+                                        v: i,
+                                        f: formatter.formatValue(i)
+                                    });
+                                }
 
-                            var rows = [];
-                            
-                            {{#each days}}
-                                rows.push(['{{date}}', {{faces}}, {{events}}, {{uniqueEvents}}])
-                            {{/each}}
-
-                            data.addRows(rows);
-                            
-                            var formatter = new google.visualization.NumberFormat({negativeColor: 'red', groupingSymbol: ' ', fractionDigits: 0});
-                            formatter.format(data, 0);
-                            formatter.format(data, 1);
-                            formatter.format(data, 2);
-                            formatter.format(data, 3);
-
-                            var firstAxisTicks = [];
-                            var firstAxisRange = data.getColumnRange(1);
-                            for (var i = firstAxisRange.min; i <= firstAxisRange.max; i=i+1000) {
-                                firstAxisTicks.push({
-                                    v: i,
-                                    f: formatter.formatValue(i)
-                                });
-                            }
-
-                            var secondAxisTicks = [];
-                            var secondAxisRange = data.getColumnRange(2);
-                            for (var i = secondAxisRange.min; i <= secondAxisRange.max; i=i+100) {                               
-                                secondAxisTicks.push({
-                                    v: i,
-                                    f: formatter.formatValue(i)
-                                });
-                            }
-
-                            var options = {
-                                chart: {
-                                title: 'Events and faces',
-                                subtitle: 'grouped by days'
-                                },
-                                width: 1600,
-                                height: 400,
-                                tooltip: {
-                                    textStyle: { 
-                                        color: '#3A4276',
-                                        fontName: 'Roboto',
-                                        fontSize: 14,
-                                        bold: false,
-                                        italic: false
+                                var options = {
+                                    chart: {
+                                    title: 'Events and faces',
+                                    subtitle: 'grouped by days'
                                     },
-                                    trigger: 'focus'                                  
-                                },
-                                legend: {
-                                    position: 'none',
-                                    alignment: 'center',
-                                    textStyle: { 
-                                        color: '#3A4276',
-                                        fontName: 'Roboto',
-                                        fontSize: 14,
-                                        bold: false,
-                                        italic: false
-                                    }
-                                },
-                                colors: ['#FF4C61', '#FFB800', '#58D8F4'],
-                                hAxis: {textStyle: { 
-                                    color: '#7B7F9E',
-                                    fontName: 'Roboto',
-                                    fontSize: 12,
-                                    bold: false,
-                                    italic: false
-                                 }
-                                },
-                                series: {
-                                    0: {targetAxisIndex: 0},
-                                    1: {targetAxisIndex: 1},
-                                    2: {targetAxisIndex: 1}
-                                },
-                                vAxes: {
-                                    // Adds titles to each axis.
-                                    0: {
-                                        //title: 'Лица',
+                                    width: 1600,
+                                    height: 400,
+                                    backgroundColor: darkTheme ? '#171822' : '',
+                                    tooltip: {
                                         textStyle: { 
-                                            color: '#7B7F9E',
+                                            color: darkTheme ? '#A7ACD3' : '#3A4276',
                                             fontName: 'Roboto',
-                                            fontSize: 12,
-                                            bold: false,
-                                            italic: false,
-                                        },
-                                        ticks: firstAxisTicks
-                                            //titleTextStyle: {
-                                            //color: '#7B7F9E',
-                                            //fontName: 'Roboto',
-                                            //fontSize: 14,
-                                            //bold: false,
-                                            //italic: false
-                                        //}
-                                    },
-                                    1: {
-                                        //title: 'Сработки',
-                                        textStyle: { 
-                                            color: '#7B7F9E',
-                                            fontName: 'Roboto',
-                                            fontSize: 12,
+                                            fontSize: 14,
                                             bold: false,
                                             italic: false
                                         },
-                                        ticks: secondAxisTicks
-                                        //titleTextStyle: {
-                                            //color: '#7B7F9E',
-                                            //fontName: 'Roboto',
-                                            //fontSize: 14,
-                                            //bold: false,
-                                            //italic: false
-                                        //},
-                                    }
-                                },
-                                focusTarget: 'category'
-                            };
-
-                            var chart = new google.visualization.LineChart(document.getElementById('{{title}}'));
-
-                            chart.draw(data, options);
-
-                            var prevOptions = {
-                                chart: {
-                                title: 'Events and faces',
-                                subtitle: 'preview'
-                                },
-                                width: 1600,
-                                height: 75,
-                                tooltip: {
-                                    trigger: 'none'                                  
-                                },
-                                legend: 'none',
-                                colors: ['#cccccc', '#cccccc', '#cccccc'],   
-                                series: {
-                                    0: {targetAxisIndex: 0},
-                                    1: {targetAxisIndex: 1},
-                                    2: {targetAxisIndex: 1}
-                                },
-                                hAxis: {
-                                    baselineColor: 'transparent',
-                                    gridlineColor: 'transparent',
-                                    textPosition: 'none',
-                                    gridlines: {
-                                        color: 'transparent'
+                                        trigger: 'focus'                                  
                                     },
-                                    ticks: []
-                                },
-                                vAxes: {
-                                    0:{
-                                        baselineColor: 'transparent',
-                                        gridlineColor: 'transparent',
-                                        textPosition: 'none',
-                                        gridlines: {
-                                            color: 'transparent'
-                                        },
-                                        ticks: []
+                                    legend: {
+                                        position: 'none',
+                                        alignment: 'center',
+                                        textStyle: { 
+                                            color: darkTheme ? '#A7ACD3' : '#3A4276',
+                                            fontName: 'Roboto',
+                                            fontSize: 14,
+                                            bold: false,
+                                            italic: false
+                                        }
                                     },
-                                    1:{
-                                        baselineColor: 'transparent',
-                                        gridlineColor: 'transparent',
-                                        textPosition: 'none',
-                                        gridlines: {
-                                            color: 'transparent'
-                                        },
-                                        ticks: []
+                                    colors: ['#FF4C61', '#FFB800', '#58D8F4'],
+                                    hAxis: {textStyle: { 
+                                        color: darkTheme ? '#A7ACD3' : '#7B7F9E',
+                                        fontName: 'Roboto',
+                                        fontSize: 12,
+                                        bold: false,
+                                        italic: false
                                     }
-                                },
-                                backgroundColor: 'transparent'                       
-                            };
-
-                            var prevchart = new google.visualization.LineChart(document.getElementsByClassName('chart-preview')[{{index}}]);
-
-                            prevchart.draw(data, prevOptions);
-
-                            function showHideLines(selector){
-                                switch(selector) {
-                                    case 'faces':
-                                        var color = options.colors[0];
-                                        if(color === '#FF4C61'){
-                                            options.colors[0] = "#FFFFFF";
-                                            options.series[0].lineWidth = 0;
-                                            options.vAxes[0].textStyle.color = "#FFFFFF";
-                                            $(".firstaxis").css("color", "#FFFFFF");
+                                    },
+                                    series: {
+                                        0: {targetAxisIndex: 0},
+                                        1: {targetAxisIndex: 1},
+                                        2: {targetAxisIndex: 1}
+                                    },
+                                    vAxes: {
+                                        // Adds titles to each axis.
+                                        0: {
+                                            //title: 'Лица',
+                                            textStyle: { 
+                                                color: darkTheme ? '#A7ACD3' : '#7B7F9E',
+                                                fontName: 'Roboto',
+                                                fontSize: 12,
+                                                bold: false,
+                                                italic: false,
+                                            },
+                                            ticks: firstAxisTicks
+                                                //titleTextStyle: {
+                                                //color: '#7B7F9E',
+                                                //fontName: 'Roboto',
+                                                //fontSize: 14,
+                                                //bold: false,
+                                                //italic: false
+                                            //}
+                                        },
+                                        1: {
+                                            //title: 'Сработки',
+                                            textStyle: { 
+                                                color: darkTheme ? '#A7ACD3' : '#7B7F9E',
+                                                fontName: 'Roboto',
+                                                fontSize: 12,
+                                                bold: false,
+                                                italic: false
+                                            },
+                                            ticks: secondAxisTicks
+                                            //titleTextStyle: {
+                                                //color: '#7B7F9E',
+                                                //fontName: 'Roboto',
+                                                //fontSize: 14,
+                                                //bold: false,
+                                                //italic: false
+                                            //},
                                         }
-                                        else{
-                                            options.series[0].lineWidth = 2;
-                                            options.colors[0] = "#FF4C61";
-                                            options.vAxes[0].textStyle.color = "#7B7F9E";
-                                            $(".firstaxis").css("color", "#7B7F9E");
-                                        }
-                                    break;
+                                    },
+                                    focusTarget: 'category'
+                                };
 
-                                    case 'events':
-                                        var color = options.colors[1];
-                                        if(color === '#FFB800'){
-                                            options.colors[1] = "#FFFFFF";
-                                            options.series[1].lineWidth = 0;
-                                            if(options.colors[2] === "#FFFFFF"){
-                                                options.vAxes[1].textStyle.color = "#FFFFFF";
-                                                $(".secondaxis").css("color", "#FFFFFF");
-                                            }
-                                        }
-                                        else{
-                                            options.series[1].lineWidth = 2;
-                                            options.colors[1] = "#FFB800";
-                                            options.vAxes[1].textStyle.color = "#7B7F9E";
-                                            $(".secondaxis").css("color", "#7B7F9E");
-                                        }
-                                    break;
+                                var chart = new google.visualization.LineChart(document.getElementById('{{title}}'));
 
-                                    case 'uniqueEvents':
-                                        var color = options.colors[2];
-                                        if(color === '#58D8F4'){
-                                            options.series[2].lineWidth = 0;
-                                            options.colors[2] = "#FFFFFF";
-                                            if(options.colors[1] === "#FFFFFF"){
-                                                options.vAxes[1].textStyle.color = "#FFFFFF";
-                                                $(".secondaxis").css("color", "#FFFFFF");
-                                            }
-                                        }
-                                        else{
-                                            options.series[2].lineWidth = 2;
-                                            options.colors[2] = "#58D8F4";
-                                            options.vAxes[1].textStyle.color = "#7B7F9E";
-                                            $(".secondaxis").css("color", "#7B7F9E");
-                                        }
-                                    break;
-
-                                    default:
-                                        break;
-                                }
                                 chart.draw(data, options);
-                            }
 
-                            document.getElementById('faces-box-label-{{title}}').addEventListener('click', () => {showHideLines('faces')})
-                            document.getElementById('uniquevents-box-label-{{title}}').addEventListener('click', () => {showHideLines('uniqueEvents')})
-                            document.getElementById('events-box-label-{{title}}').addEventListener('click', () => {showHideLines('events')})
+                                var prevOptions = {
+                                    chart: {
+                                    title: 'Events and faces',
+                                    subtitle: 'preview'
+                                    },
+                                    width: 1600,
+                                    height: 75,
+                                    tooltip: {
+                                        trigger: 'none'                                  
+                                    },
+                                    legend: 'none',
+                                    colors: ['#cccccc', '#cccccc', '#cccccc'],   
+                                    series: {
+                                        0: {targetAxisIndex: 0},
+                                        1: {targetAxisIndex: 1},
+                                        2: {targetAxisIndex: 1}
+                                    },
+                                    hAxis: {
+                                        baselineColor: 'transparent',
+                                        gridlineColor: 'transparent',
+                                        textPosition: 'none',
+                                        gridlines: {
+                                            color: 'transparent'
+                                        },
+                                        ticks: []
+                                    },
+                                    vAxes: {
+                                        0:{
+                                            baselineColor: 'transparent',
+                                            gridlineColor: 'transparent',
+                                            textPosition: 'none',
+                                            gridlines: {
+                                                color: 'transparent'
+                                            },
+                                            ticks: []
+                                        },
+                                        1:{
+                                            baselineColor: 'transparent',
+                                            gridlineColor: 'transparent',
+                                            textPosition: 'none',
+                                            gridlines: {
+                                                color: 'transparent'
+                                            },
+                                            ticks: []
+                                        }
+                                    },
+                                    backgroundColor: 'transparent'                       
+                                };
 
-                            function handleSelect(){
-                                var targetX = document.getElementsByTagName('circle')[0].getAttribute('cx');
-                                var isFilled = document.getElementsByTagName('circle')[0].getAttribute('fill') !== 'none';
-                                var textCollection = document.getElementsByTagName('text');
-                                Array.from(textCollection).forEach(element => {
-                                    if(element.getAttribute('x') == targetX && isFilled){
-                                        element.style.fontSize = '14px';
-                                        element.style.fontWeight = 'bold';
+                                var prevchart = new google.visualization.LineChart(document.getElementsByClassName('chart-preview')[{{index}}]);
+
+                                prevchart.draw(data, prevOptions);
+
+                                function showHideLines(selector){
+                                    var color;
+                                    switch(selector) {
+                                        case 'faces':
+                                            color = options.colors[0];
+                                            if(color === '#FF4C61'){
+                                                options.colors[0] = darkTheme ? "#171822" : "#FFFFFF";
+                                                options.series[0].lineWidth = 0;
+                                                options.vAxes[0].textStyle.color = darkTheme ? "#171822" : "#FFFFFF";
+                                                if(darkTheme){
+                                                    $(".firstaxis").css("color", "#171822");
+                                                }
+                                                else{
+                                                    $(".firstaxis").css("color", "#FFFFFF");
+                                                }
+                                            }
+                                            else{
+                                                options.series[0].lineWidth = 2;
+                                                options.colors[0] = "#FF4C61";
+                                                if(darkTheme){
+                                                    options.vAxes[0].textStyle.color = "#A7ACD3";
+                                                    $(".firstaxis").css("color", "#A7ACD3");
+                                                }
+                                                else{
+                                                    options.vAxes[0].textStyle.color = "#7B7F9E";
+                                                    $(".firstaxis").css("color", "#7B7F9E");
+                                                }
+                                            }
+                                        break;
+
+                                        case 'events':
+                                            color = options.colors[1];
+                                            if(color === '#FFB800'){
+                                                options.colors[1] = darkTheme ? "#171822" : "#FFFFFF";
+                                                options.series[1].lineWidth = 0;
+                                                if(darkTheme){
+                                                    if(options.colors[2] === "#171822"){
+                                                        options.vAxes[1].textStyle.color = "#171822";
+                                                        $(".secondaxis").css("color", "#171822");
+                                                    }
+                                                }
+                                                else{
+                                                    if(options.colors[2] === "#FFFFFF"){
+                                                        options.vAxes[1].textStyle.color = "#FFFFFF";
+                                                        $(".secondaxis").css("color", "#FFFFFF");
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                options.series[1].lineWidth = 2;
+                                                options.colors[1] = "#FFB800";
+                                                if(darkTheme){
+                                                    options.vAxes[1].textStyle.color = "#A7ACD3";
+                                                    $(".secondaxis").css("color", "#A7ACD3");
+                                                }
+                                                else{
+                                                    options.vAxes[1].textStyle.color = "#7B7F9E";
+                                                    $(".secondaxis").css("color", "#7B7F9E");
+                                                }
+                                            }
+                                        break;
+
+                                        case 'uniqueEvents':
+                                            color = options.colors[2];
+                                            if(color === '#58D8F4'){
+                                                options.series[2].lineWidth = 0;
+                                                options.colors[2] = "#171822";
+                                                if(darkTheme){
+                                                    if(options.colors[1] === "#171822"){
+                                                        options.vAxes[1].textStyle.color = "#171822";
+                                                        $(".secondaxis").css("color", "#171822");
+                                                    }                                           
+                                                }
+                                                else{
+                                                    if(options.colors[1] === "#FFFFFF"){
+                                                        options.vAxes[1].textStyle.color = "#FFFFFF";
+                                                        $(".secondaxis").css("color", "#FFFFFF");
+                                                    }
+                                                }
+                                            }
+                                            else{
+                                                options.series[2].lineWidth = 2;
+                                                options.colors[2] = "#58D8F4";
+                                                if(darkTheme){
+                                                    options.vAxes[1].textStyle.color = "#A7ACD3";
+                                                    $(".secondaxis").css("color", "#A7ACD3");
+                                                }
+                                                else{
+                                                    options.vAxes[1].textStyle.color = "#7B7F9E";
+                                                    $(".secondaxis").css("color", "#7B7F9E");
+                                                }
+                                            }
+                                        break;
+
+                                        default:
+                                            break;
                                     }
-                                    else{
-                                        element.style.fontSize = '12px';
-                                        element.style.fontWeight = 'normal';
-                                    }
-                                })
-                            }
+                                    chart.draw(data, options);
+                                }
 
-                            google.visualization.events.addListener(chart, 'select', handleSelect);
-                        }
-                    </script>
-                {{/each}}
-            </ul>
+                                document.getElementById('faces-box-label-{{title}}').addEventListener('click', () => {showHideLines('faces')})
+                                document.getElementById('uniquevents-box-label-{{title}}').addEventListener('click', () => {showHideLines('uniqueEvents')})
+                                document.getElementById('events-box-label-{{title}}').addEventListener('click', () => {showHideLines('events')})
+
+                                function handleSelect(){
+                                    var targetX = document.getElementsByTagName('circle')[0].getAttribute('cx');
+                                    var isFilled = document.getElementsByTagName('circle')[0].getAttribute('fill') !== 'none';
+                                    var textCollection = document.getElementsByTagName('text');
+                                    Array.from(textCollection).forEach(element => {
+                                        if(element.getAttribute('x') == targetX && isFilled){
+                                            element.style.fontSize = '14px';
+                                            element.style.fontWeight = 'bold';
+                                        }
+                                        else{
+                                            element.style.fontSize = '12px';
+                                            element.style.fontWeight = 'normal';
+                                        }
+                                    })
+                                }
+
+                                google.visualization.events.addListener(chart, 'select', handleSelect);
+                            }
+                        </script>
+                    {{/each}}
+                </ul>
+            </div>
         </div>
     </div>
-</div>
-
 </body>
 </html>

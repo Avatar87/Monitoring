@@ -29,7 +29,8 @@ const parseEndDate = (date) => {
 
 const getDayDate = (date) => {
   var fullDate = date.toLocaleDateString('ru-RU').split(' ')[1];
-  return fullDate.split('.').slice(0,-1).join('.');
+  return fullDate.split('.').slice(0,-1)
+  .join('.');
 }
 
 const localeDateStringOverride = (dateObj) => {

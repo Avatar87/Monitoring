@@ -19,7 +19,7 @@ exports.renderDashboard = (req, res) => {
         group.fromGroupDate = null;
         group.toGroupDate = null;
     })
-    res.render('main', {groups, fromdate: currentFromDate, todate: currentToDate, lastUpdate: lastUpdate, displayAll});
+    res.render('main', {groups, fromdate: currentFromDate, todate: currentToDate, lastUpdate, displayAll});
 }
 
 exports.renderAuth = (req, res) => {

@@ -16,6 +16,7 @@ const session = require('express-session');
 const hbs = require('handlebars');
 const app = express();
 const hour = 60*60000;
+const Group = require('./models/Group');
 
 app.use(cors());
 app.engine('hbs', consolidate.handlebars);
@@ -53,7 +54,13 @@ Date.prototype.toISOString = function(){
   return ISOStringOverride(this);
 }
 
-global.currentFromDate = null; global.currentToDate = null; global.displayAll = false; global.groups = []; global.renderedGroups = []; global.groupsData = fs.readFileSync('groups.json', 'utf8');
+global.currentFromDate = null;
+global.currentToDate = null;
+global.displayAll = false;
+global.groups = [];
+global.renderedGroups = [];
+global.groupsData = fs.readFileSync('groups.json', 'utf8');
+global.lastUpdate = '';
 
 var routes = require('./routes.js');
 app.use(routes);
@@ -83,7 +90,7 @@ const getData = () => {
   fs.readFile('./logs/lastupdate.log', 'utf8', (err, data) => {
     if(data){
       let updateDate = new Date(data);
-      global.lastUpdate = leadingZero(updateDate.getHours())+':'+leadingZero(updateDate.getMinutes())+' '+leadingZero(updateDate.getDate())+'.'+leadingZero(updateDate.getMonth() + 1)+'.'+updateDate.getFullYear();
+      lastUpdate = leadingZero(updateDate.getHours())+':'+leadingZero(updateDate.getMinutes())+' '+leadingZero(updateDate.getDate())+'.'+leadingZero(updateDate.getMonth() + 1)+'.'+updateDate.getFullYear();
       console.log('last update: '+lastUpdate);
     }
     if(err){
@@ -95,10 +102,13 @@ const getData = () => {
     then((response) => JSON.parse(response)).
     then((response) => {
       response.items.forEach((group) => {
-        group.displayAll = displayAll;
-        group.startDate = parseStartDate(startDate);
-        group.endDate = parseEndDate(endDate);
-        groups.push(group);
+        let newGroup = new Group();
+        newGroup.title = group.title;
+        newGroup.monitorings = group.monitorings;
+        newGroup.displayAll = displayAll;
+        newGroup.startDate = parseStartDate(startDate);
+        newGroup.endDate = parseEndDate(endDate);
+        groups.push(newGroup);
       })
     }).
     then(() => {
@@ -203,9 +213,9 @@ const getData = () => {
           then(() => {
               renderedGroups[index] = {
                 title: group.title,
-                uniqueFaces: {faces: group.uniqueFaces.faces.map(face => {return face.timestamp}), photos: group.uniqueFaces.photos},
-                events: group.events.map(event => {return event.face.timestamp}),
-                uniqueEvents: group.uniqueEvents.map(event => {return event.face.timestamp}),
+                uniqueFaces: {faces: group.uniqueFaces.faces.map(face => { return face.timestamp }), photos: group.uniqueFaces.photos},
+                events: group.events.map(event => { return event.face.timestamp }),
+                uniqueEvents: group.uniqueEvents.map(event => { return event.face.timestamp }),
                 totalevents: group.totalevents.length,
                 displayAll: group.displayAll,
                 startDate: group.startDate,
